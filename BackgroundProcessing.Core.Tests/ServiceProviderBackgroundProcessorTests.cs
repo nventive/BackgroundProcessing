@@ -16,7 +16,7 @@ namespace BackgroundProcessing.Core.Tests
             var command = new TestCommand();
             var processor = new ServiceProviderBackgroundProcessor(serviceProvider);
 
-            Func<Task> act = async () => await processor.Process(command);
+            Func<Task> act = async () => await processor.ProcessAsync(command);
 
             act.Should().Throw<BackgroundProcessingException>().WithMessage("*handler*TestCommand*");
         }
@@ -30,7 +30,7 @@ namespace BackgroundProcessing.Core.Tests
             var command = new TestCommand();
             var processor = new ServiceProviderBackgroundProcessor(serviceProvider);
 
-            await processor.Process(command);
+            await processor.ProcessAsync(command);
 
             var handler = serviceProvider.GetRequiredService<IBackgroundCommandHandler<TestCommand>>() as TestCommandHandler;
             handler.ReceivedCommand.Should().BeSameAs(command);
@@ -44,7 +44,7 @@ namespace BackgroundProcessing.Core.Tests
         {
             public TestCommand ReceivedCommand { get; private set; }
 
-            public async Task Handle(TestCommand command, CancellationToken cancellationToken = default)
+            public async Task HandleAsync(TestCommand command, CancellationToken cancellationToken = default)
             {
                 ReceivedCommand = command;
             }

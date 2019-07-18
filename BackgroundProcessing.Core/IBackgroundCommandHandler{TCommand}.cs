@@ -16,6 +16,6 @@ namespace BackgroundProcessing.Core
         /// <param name="command">The command to handle.</param>
         /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
         /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
-        Task Handle(TCommand command, CancellationToken cancellationToken = default);
+        Task HandleAsync(TCommand command, CancellationToken cancellationToken = default);
     }
 }

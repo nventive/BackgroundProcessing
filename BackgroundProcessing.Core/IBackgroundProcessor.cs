@@ -14,6 +14,6 @@ namespace BackgroundProcessing.Core
         /// <param name="command">The <see cref="IBackgroundCommand"/> to process.</param>
         /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
         /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
-        Task Process(IBackgroundCommand command, CancellationToken cancellationToken = default);
+        Task ProcessAsync(IBackgroundCommand command, CancellationToken cancellationToken = default);
     }
 }

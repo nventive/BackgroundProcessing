@@ -1,5 +1,4 @@
-﻿using System.Threading;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 
 namespace BackgroundProcessing.Core
 {
@@ -9,11 +8,10 @@ namespace BackgroundProcessing.Core
     public interface IBackgroundDispatcher
     {
         /// <summary>
-        /// Dispatches a <paramref name="command"/> for later execution.
+        /// Dispatches <paramref name="commands"/> for later execution.
         /// </summary>
-        /// <param name="command">The <see cref="IBackgroundCommand"/> to process.</param>
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
+        /// <param name="commands">The <see cref="IBackgroundCommand"/>s to process.</param>
         /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
-        Task Dispatch(IBackgroundCommand command, CancellationToken cancellationToken = default);
+        Task DispatchAsync(params IBackgroundCommand[] commands);
     }
 }
