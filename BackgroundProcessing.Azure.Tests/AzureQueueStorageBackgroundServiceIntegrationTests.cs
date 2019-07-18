@@ -10,7 +10,7 @@ using Xunit;
 
 namespace BackgroundProcessing.Azure.Tests
 {
-    public class StorageQueueBackgroundCommandQueueIntegrationTests
+    public class AzureQueueStorageBackgroundServiceIntegrationTests
     {
         [Fact]
         public async Task ItShouldProcessBackgroundCommands()
@@ -33,7 +33,7 @@ namespace BackgroundProcessing.Azure.Tests
                             return queue;
                         })
                         .AddHostingServiceAzureQueueStorageBackgroundProcessing()
-                        .AddBackgroundCommandHandlersFromAssemblyContaining<StorageQueueBackgroundCommandQueueIntegrationTests>();
+                        .AddBackgroundCommandHandlersFromAssemblyContaining<AzureQueueStorageBackgroundServiceIntegrationTests>();
                 })
                 .Start())
             {

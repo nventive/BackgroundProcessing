@@ -28,7 +28,7 @@ namespace BackgroundProcessing.Core.Tests
             using (var host = new HostBuilder()
                 .ConfigureServices(services =>
                 {
-                    services.AddSingleton<ILogger<BackgroundCommandQueueService>>(_ => new XunitLogger<BackgroundCommandQueueService>(_output));
+                    services.AddSingleton<ILogger<ConcurrentQueueDispatcherBackgroundService>>(_ => new XunitLogger<ConcurrentQueueDispatcherBackgroundService>(_output));
                     services
                         .AddHostingServiceConcurrentQueueBackgroundProcessing()
                         .AddBackgroundCommandHandlersFromAssemblyContaining<HostingServiceIntegrationTests>();

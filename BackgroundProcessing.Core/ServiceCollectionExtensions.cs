@@ -2,6 +2,7 @@
 using System.Reflection;
 using BackgroundProcessing.Core;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Hosting;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
@@ -60,17 +61,18 @@ namespace Microsoft.Extensions.DependencyInjection
         }
 
         /// <summary>
-        /// Setup local processing of <see cref="IBackgroundCommand"/> using in-memory <see cref="ConcurrentBackgroundCommandQueue"/>.
+        /// Setup local processing of <see cref="IBackgroundCommand"/> using in-memory <see cref="ConcurrentQueueDispatcherBackgroundService"/>.
         /// Use only for POCs or unit-test, as it does not provide any retry or persistence mechanism.
         /// </summary>
         /// <param name="services">The <see cref="IServiceCollection"/> to configure.</param>
         /// <returns>The configured <see cref="IServiceCollection"/>.</returns>
         public static IServiceCollection AddHostingServiceConcurrentQueueBackgroundProcessing(this IServiceCollection services)
         {
-            services.TryAddSingleton<IBackgroundCommandQueue, ConcurrentBackgroundCommandQueue>();
             services.TryAddScoped<IBackgroundProcessor, ServiceProviderBackgroundProcessor>();
-            services.TryAddScoped<IBackgroundDispatcher, BackgroundCommandQueueDispatcher>();
-            services.AddHostedService<BackgroundCommandQueueService>();
+
+            services.AddSingleton<ConcurrentQueueDispatcherBackgroundService>();
+            services.AddTransient<IHostedService>(sp => sp.GetRequiredService<ConcurrentQueueDispatcherBackgroundService>());
+            services.AddSingleton<IBackgroundDispatcher>(sp => sp.GetRequiredService<ConcurrentQueueDispatcherBackgroundService>());
 
             return services;
         }
