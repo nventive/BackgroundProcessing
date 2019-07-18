@@ -55,5 +55,20 @@ namespace Microsoft.Extensions.DependencyInjection
 
             return services;
         }
+
+        /// <summary>
+        /// Registers processing of commands from Azure Queue Storage in Azure Functions Queue Trigger.
+        /// <see cref="AzureFunctionsQueueStorageHandler"/>.
+        /// </summary>
+        /// <param name="services">The <see cref="IServiceCollection"/> to configure.</param>
+        /// <returns>The configured <see cref="IServiceCollection"/>.</returns>
+        public static IServiceCollection AddAzureFunctionsQueueStorageProcessing(this IServiceCollection services)
+        {
+            services.TryAddSingleton<IBackgroundCommandSerializer, JsonNetBackgroundCommandSerializer>();
+            services.TryAddScoped<IBackgroundProcessor, ServiceProviderBackgroundProcessor>();
+            services.AddScoped<AzureFunctionsQueueStorageHandler>();
+
+            return services;
+        }
     }
 }
