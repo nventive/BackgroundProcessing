@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using BackgroundProcessing.Core.HostingService;
 using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -31,14 +30,17 @@ namespace BackgroundProcessing.Core.Tests
                 {
                     services.AddSingleton<ILogger<BackgroundCommandQueueService>>(_ => new XunitLogger<BackgroundCommandQueueService>(_output));
                     services
-                        .AddHostingServiceQueueBackgroundProcessing()
+                        .AddHostingServiceConcurrentQueueBackgroundProcessing()
                         .AddBackgroundCommandHandlersFromAssemblyContaining<HostingServiceIntegrationTests>();
                 })
                 .Start())
             {
                 var dispatcher = host.Services.GetRequiredService<IBackgroundDispatcher>();
 
-                await dispatcher.DispatchAsync(commands);
+                foreach (var command in commands)
+                {
+                    await dispatcher.DispatchAsync(command);
+                }
 
                 await Task.Delay(100);
             }

@@ -1,7 +1,8 @@
 ﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 
-namespace BackgroundProcessing.Core.HostingService
+namespace BackgroundProcessing.Core
 {
     /// <summary>
     /// <see cref="IBackgroundDispatcher"/> implementation that pushes <see cref="IBackgroundCommand"/> to <see cref="IBackgroundCommandQueue"/>.
@@ -20,6 +21,6 @@ namespace BackgroundProcessing.Core.HostingService
         }
 
         /// <inheritdoc />
-        public Task DispatchAsync(params IBackgroundCommand[] commands) => _queue.QueueAsync(commands);
+        public Task DispatchAsync(IBackgroundCommand command, CancellationToken cancellationToken = default) => _queue.QueueAsync(command, cancellationToken);
     }
 }

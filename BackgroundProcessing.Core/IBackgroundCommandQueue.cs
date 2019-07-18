@@ -1,7 +1,7 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 
-namespace BackgroundProcessing.Core.HostingService
+namespace BackgroundProcessing.Core
 {
     /// <summary>
     /// Simple <see cref="IBackgroundCommand"/> queue mechanism.
@@ -9,11 +9,12 @@ namespace BackgroundProcessing.Core.HostingService
     public interface IBackgroundCommandQueue
     {
         /// <summary>
-        /// Queue <paramref name="commands"/>.
+        /// Queue The <paramref name="command"/>.
         /// </summary>
-        /// <param name="commands">The <see cref="IBackgroundCommand"/>s to queue.</param>
+        /// <param name="command">The <see cref="IBackgroundCommand"/> to queue.</param>
+        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
         /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
-        Task QueueAsync(params IBackgroundCommand[] commands);
+        Task QueueAsync(IBackgroundCommand command, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Dequeue <see cref="IBackgroundCommand"/>. This is a BLOCKING operation.

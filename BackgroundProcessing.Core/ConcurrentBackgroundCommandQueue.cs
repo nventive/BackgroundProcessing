@@ -3,33 +3,27 @@ using System.Collections.Concurrent;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace BackgroundProcessing.Core.HostingService
+namespace BackgroundProcessing.Core
 {
     /// <summary>
-    /// <see cref="IBackgroundCommandQueue"/> implementation using <see cref="ConcurrentQueue{T}"/>.
+    /// <see cref="IBackgroundCommandQueue"/> implementation using <see cref="ConcurrentQueue{T}"/> and <see cref="SemaphoreSlim"/>.
     /// </summary>
-    public class ConcurrentBackgroundCommandQueueDispatcher : IBackgroundCommandQueue, IDisposable
+    public class ConcurrentBackgroundCommandQueue : IBackgroundCommandQueue, IDisposable
     {
         private readonly ConcurrentQueue<IBackgroundCommand> _queue = new ConcurrentQueue<IBackgroundCommand>();
         private readonly SemaphoreSlim _semaphore = new SemaphoreSlim(0);
         private bool _disposed = false;
 
         /// <inheritdoc />
-        public async Task QueueAsync(params IBackgroundCommand[] commands)
+        public async Task QueueAsync(IBackgroundCommand command, CancellationToken cancellationToken = default)
         {
-            if (commands == null)
+            if (command == null)
             {
-                throw new ArgumentNullException(nameof(commands));
+                throw new ArgumentNullException(nameof(command));
             }
 
-            foreach (var command in commands)
-            {
-                if (command != null)
-                {
-                    _queue.Enqueue(command);
-                    _semaphore.Release();
-                }
-            }
+            _queue.Enqueue(command);
+            _semaphore.Release();
         }
 
         /// <inheritdoc />

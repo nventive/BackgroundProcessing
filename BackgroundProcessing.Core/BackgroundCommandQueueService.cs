@@ -6,7 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
-namespace BackgroundProcessing.Core.HostingService
+namespace BackgroundProcessing.Core
 {
     /// <summary>
     /// <see cref="BackgroundService"/> that dequeues <see cref="IBackgroundCommand"/>s from
