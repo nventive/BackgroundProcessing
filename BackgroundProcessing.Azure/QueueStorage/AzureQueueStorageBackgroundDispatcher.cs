@@ -2,6 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using BackgroundProcessing.Core;
+using Microsoft.Extensions.Options;
 using Microsoft.WindowsAzure.Storage.Queue;
 
 namespace BackgroundProcessing.Azure.QueueStorage
@@ -11,18 +12,22 @@ namespace BackgroundProcessing.Azure.QueueStorage
     /// </summary>
     public class AzureQueueStorageBackgroundDispatcher : IBackgroundDispatcher
     {
+        private readonly IOptions<AzureQueueStorageBackgroundDispatcherOptions> _options;
         private readonly CloudQueue _queue;
         private readonly IBackgroundCommandSerializer _serializer;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="AzureQueueStorageBackgroundDispatcher"/> class.
         /// </summary>
+        /// <param name="options">The <see cref="AzureQueueStorageBackgroundDispatcherOptions"/>.</param>
         /// <param name="queue">The <see cref="CloudQueue"/>.</param>
         /// <param name="serializer">The <see cref="IBackgroundCommandSerializer"/>.</param>
         public AzureQueueStorageBackgroundDispatcher(
+            IOptions<AzureQueueStorageBackgroundDispatcherOptions> options,
             CloudQueue queue,
             IBackgroundCommandSerializer serializer)
         {
+            _options = options ?? throw new ArgumentNullException(nameof(options));
             _queue = queue ?? throw new ArgumentNullException(nameof(queue));
             _serializer = serializer ?? throw new ArgumentNullException(nameof(serializer));
         }
@@ -37,12 +42,13 @@ namespace BackgroundProcessing.Azure.QueueStorage
 
             try
             {
+                var options = _options.Value;
                 await _queue.AddMessageAsync(
                     new CloudQueueMessage(await _serializer.SerializeAsync(command)),
-                    timeToLive: null,
-                    initialVisibilityDelay: null,
-                    options: null,
-                    operationContext: null,
+                    timeToLive: options.TimeToLive,
+                    initialVisibilityDelay: options.InitialVisibilityDelay,
+                    options: options.QueueRequestOptions,
+                    operationContext: options.OperationContextBuilder != null ? options.OperationContextBuilder(command) : null,
                     cancellationToken);
             }
             catch (Exception ex)

@@ -32,7 +32,8 @@ namespace BackgroundProcessing.Azure.Tests
 
                             return queue;
                         })
-                        .AddHostingServiceAzureQueueStorageBackgroundProcessing()
+                        .AddAzureQueueStorageBackgroundDispatcher()
+                        .AddAzureQueueStorageBackgroundProcessing()
                         .AddBackgroundCommandHandlersFromAssemblyContaining<AzureQueueStorageBackgroundServiceIntegrationTests>();
                 })
                 .Start())
