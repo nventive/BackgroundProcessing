@@ -8,7 +8,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.WindowsAzure.Storage;
 using Xunit;
 
-namespace BackgroundProcessing.Azure.Tests
+namespace BackgroundProcessing.Azure.Tests.QueueStorage
 {
     public class AzureQueueStorageBackgroundServiceIntegrationTests
     {

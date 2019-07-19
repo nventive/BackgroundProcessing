@@ -2,7 +2,6 @@
 using System.Threading;
 using System.Threading.Tasks;
 using BackgroundProcessing.Core;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace BackgroundProcessing.Azure.QueueStorage
 {
@@ -12,19 +11,19 @@ namespace BackgroundProcessing.Azure.QueueStorage
     public class AzureFunctionsQueueStorageHandler
     {
         private readonly IBackgroundCommandSerializer _serializer;
-        private readonly IServiceProvider _services;
+        private readonly IBackgroundProcessor _processor;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="AzureFunctionsQueueStorageHandler"/> class.
         /// </summary>
         /// <param name="serializer">The <see cref="IBackgroundCommandSerializer"/>.</param>
-        /// <param name="services">The <see cref="IServiceProvider"/> used to manage scopes.</param>
+        /// <param name="processor">The <see cref="IBackgroundProcessor"/> to use.</param>
         public AzureFunctionsQueueStorageHandler(
             IBackgroundCommandSerializer serializer,
-            IServiceProvider services)
+            IBackgroundProcessor processor)
         {
             _serializer = serializer ?? throw new ArgumentNullException(nameof(serializer));
-            _services = services ?? throw new ArgumentNullException(nameof(services));
+            _processor = processor ?? throw new ArgumentNullException(nameof(processor));
         }
 
         /// <summary>
@@ -41,9 +40,7 @@ namespace BackgroundProcessing.Azure.QueueStorage
             }
 
             var command = await _serializer.DeserializeAsync(message);
-
-            var processor = _services.GetRequiredService<IBackgroundProcessor>();
-            await processor.ProcessAsync(command, cancellationToken);
+            await _processor.ProcessAsync(command, cancellationToken);
         }
     }
 }
