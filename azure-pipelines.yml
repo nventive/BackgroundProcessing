@@ -15,8 +15,8 @@ steps:
 - script: dotnet build --configuration $(buildConfiguration) -p:Version=$(GitVersion.NuGetVersionV2) -p:FileVersion=$(GitVersion.AssemblySemVer) -p:InformationalVersion=$(GitVersion.InformationalVersion)
   displayName: Build
 
-- script: dotnet test --no-build --configuration $(buildConfiguration) --logger:trx
-  displayName: Test
+# - script: dotnet test --no-build --configuration $(buildConfiguration) --logger:trx
+# displayName: Test
 
 - task: PublishTestResults@2
   displayName: Publish Tests Results
