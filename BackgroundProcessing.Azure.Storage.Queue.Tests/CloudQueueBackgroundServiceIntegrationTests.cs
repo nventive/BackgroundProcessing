@@ -10,15 +10,15 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Xunit;
 
-namespace BackgroundProcessing.Azure.Tests.QueueStorage
+namespace BackgroundProcessing.Azure.Storage.Queue.Tests
 {
-    public class AzureQueueStorageBackgroundServiceIntegrationTests
+    public class CloudQueueBackgroundServiceIntegrationTests
     {
         [Fact]
         public async Task ItShouldProcessBackgroundCommands()
         {
-            StorageQueueIntegrationTestsCommandHandler.Commands.Clear();
-            var commands = new[] { new StorageQueueIntegrationTestsCommand(), new StorageQueueIntegrationTestsCommand() };
+            CloudQueueIntegrationTestsCommandHandler.Commands.Clear();
+            var commands = new[] { new CloudQueueIntegrationTestsCommand(), new CloudQueueIntegrationTestsCommand() };
 
             using (var host = new HostBuilder()
                 .ConfigureServices(services =>
@@ -34,9 +34,9 @@ namespace BackgroundProcessing.Azure.Tests.QueueStorage
 
                             return queue;
                         })
-                        .AddAzureQueueStorageBackgroundDispatcher()
-                        .AddAzureQueueStorageBackgroundProcessing()
-                        .AddBackgroundCommandHandlersFromAssemblyContaining<AzureQueueStorageBackgroundServiceIntegrationTests>();
+                        .AddAzureStorageQueueBackgroundDispatcher()
+                        .AddAzureStorageQueueBackgroundProcessing()
+                        .AddBackgroundCommandHandlersFromAssemblyContaining<CloudQueueBackgroundServiceIntegrationTests>();
                 })
                 .Start())
             {
@@ -51,13 +51,13 @@ namespace BackgroundProcessing.Azure.Tests.QueueStorage
                 await host.StopAsync();
             }
 
-            StorageQueueIntegrationTestsCommandHandler.Commands.Should().BeEquivalentTo(commands);
+            CloudQueueIntegrationTestsCommandHandler.Commands.Should().BeEquivalentTo(commands);
         }
 
         [Fact]
         public async Task ItShouldInvokeErrorHandler()
         {
-            var command = new StorageQueueIntegrationTestsErrorCommand();
+            var command = new CloudQueueIntegrationTestsErrorCommand();
             IBackgroundCommand caughtCommand = null;
             Exception caughtException = null;
 
@@ -75,8 +75,8 @@ namespace BackgroundProcessing.Azure.Tests.QueueStorage
 
                             return queue;
                         })
-                        .AddAzureQueueStorageBackgroundDispatcher()
-                        .AddAzureQueueStorageBackgroundProcessing(options =>
+                        .AddAzureStorageQueueBackgroundDispatcher()
+                        .AddAzureStorageQueueBackgroundProcessing(options =>
                         {
                             options.ErrorHandler = async (cmd, ex, ct) =>
                             {
@@ -84,7 +84,7 @@ namespace BackgroundProcessing.Azure.Tests.QueueStorage
                                 caughtException = ex;
                             };
                         })
-                        .AddBackgroundCommandHandlersFromAssemblyContaining<AzureQueueStorageBackgroundServiceIntegrationTests>();
+                        .AddBackgroundCommandHandlersFromAssemblyContaining<CloudQueueBackgroundServiceIntegrationTests>();
                 })
                 .Start())
             {
@@ -98,27 +98,27 @@ namespace BackgroundProcessing.Azure.Tests.QueueStorage
             caughtException.Message.Should().Be(command.Id);
         }
 
-        private class StorageQueueIntegrationTestsCommand : BackgroundCommand
+        private class CloudQueueIntegrationTestsCommand : BackgroundCommand
         {
         }
 
-        private class StorageQueueIntegrationTestsCommandHandler : IBackgroundCommandHandler<StorageQueueIntegrationTestsCommand>
+        private class CloudQueueIntegrationTestsCommandHandler : IBackgroundCommandHandler<CloudQueueIntegrationTestsCommand>
         {
-            public static readonly IList<StorageQueueIntegrationTestsCommand> Commands = new List<StorageQueueIntegrationTestsCommand>();
+            public static readonly IList<CloudQueueIntegrationTestsCommand> Commands = new List<CloudQueueIntegrationTestsCommand>();
 
-            public async Task HandleAsync(StorageQueueIntegrationTestsCommand command, CancellationToken cancellationToken = default)
+            public async Task HandleAsync(CloudQueueIntegrationTestsCommand command, CancellationToken cancellationToken = default)
             {
                 Commands.Add(command);
             }
         }
 
-        private class StorageQueueIntegrationTestsErrorCommand : BackgroundCommand
+        private class CloudQueueIntegrationTestsErrorCommand : BackgroundCommand
         {
         }
 
-        private class StorageQueueIntegrationTestsErrorCommandHandler : IBackgroundCommandHandler<StorageQueueIntegrationTestsErrorCommand>
+        private class CloudQueueIntegrationTestsErrorCommandHandler : IBackgroundCommandHandler<CloudQueueIntegrationTestsErrorCommand>
         {
-            public async Task HandleAsync(StorageQueueIntegrationTestsErrorCommand command, CancellationToken cancellationToken = default)
+            public async Task HandleAsync(CloudQueueIntegrationTestsErrorCommand command, CancellationToken cancellationToken = default)
             {
                 throw new Exception(command.Id);
             }

@@ -5,25 +5,25 @@ using BackgroundProcessing.Core;
 using Microsoft.Azure.Storage.Queue;
 using Microsoft.Extensions.Options;
 
-namespace BackgroundProcessing.Azure.QueueStorage
+namespace BackgroundProcessing.Azure.Storage.Queue
 {
     /// <summary>
     /// <see cref="IBackgroundDispatcher"/> for <see cref="CloudQueue"/>.
     /// </summary>
-    public class AzureQueueStorageBackgroundDispatcher : IBackgroundDispatcher
+    public class CloudQueueBackgroundDispatcher : IBackgroundDispatcher
     {
-        private readonly IOptions<AzureQueueStorageBackgroundDispatcherOptions> _options;
+        private readonly IOptions<CloudQueueBackgroundDispatcherOptions> _options;
         private readonly CloudQueue _queue;
         private readonly IBackgroundCommandSerializer _serializer;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="AzureQueueStorageBackgroundDispatcher"/> class.
+        /// Initializes a new instance of the <see cref="CloudQueueBackgroundDispatcher"/> class.
         /// </summary>
-        /// <param name="options">The <see cref="AzureQueueStorageBackgroundDispatcherOptions"/>.</param>
+        /// <param name="options">The <see cref="CloudQueueBackgroundDispatcherOptions"/>.</param>
         /// <param name="queue">The <see cref="CloudQueue"/>.</param>
         /// <param name="serializer">The <see cref="IBackgroundCommandSerializer"/>.</param>
-        public AzureQueueStorageBackgroundDispatcher(
-            IOptions<AzureQueueStorageBackgroundDispatcherOptions> options,
+        public CloudQueueBackgroundDispatcher(
+            IOptions<CloudQueueBackgroundDispatcherOptions> options,
             CloudQueue queue,
             IBackgroundCommandSerializer serializer)
         {

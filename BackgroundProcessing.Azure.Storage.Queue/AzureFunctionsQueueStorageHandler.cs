@@ -3,7 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using BackgroundProcessing.Core;
 
-namespace BackgroundProcessing.Azure.QueueStorage
+namespace BackgroundProcessing.Azure.Storage.Queue
 {
     /// <summary>
     /// This is a helper class for processing Azure Queue Storage commands in an Azure Functions Queue Trigger.

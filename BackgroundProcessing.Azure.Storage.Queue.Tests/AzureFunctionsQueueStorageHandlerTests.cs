@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
-using BackgroundProcessing.Azure.QueueStorage;
 using BackgroundProcessing.Core;
 using BackgroundProcessing.Core.Serializers;
 using Moq;
 using Xunit;
 
-namespace BackgroundProcessing.Azure.Tests.QueueStorage
+namespace BackgroundProcessing.Azure.Storage.Queue.Tests
 {
     public class AzureFunctionsQueueStorageHandlerTests
     {

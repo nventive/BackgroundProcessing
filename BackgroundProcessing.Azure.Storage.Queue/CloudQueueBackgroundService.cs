@@ -11,33 +11,33 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-namespace BackgroundProcessing.Azure.QueueStorage
+namespace BackgroundProcessing.Azure.Storage.Queue
 {
     /// <summary>
     /// <see cref="BackgroundService"/> implementation that uses <see cref="CloudQueue"/>.
     /// </summary>
-    public class AzureQueueStorageBackgroundService : BackgroundService
+    public class CloudQueueBackgroundService : BackgroundService
     {
-        private readonly IOptions<AzureQueueStorageBackgroundServiceOptions> _options;
+        private readonly IOptions<CloudQueueBackgroundServiceOptions> _options;
         private readonly CloudQueue _queue;
         private readonly IBackgroundCommandSerializer _serializer;
         private readonly IServiceProvider _services;
         private readonly ILogger _logger;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="AzureQueueStorageBackgroundService"/> class.
+        /// Initializes a new instance of the <see cref="CloudQueueBackgroundService"/> class.
         /// </summary>
-        /// <param name="options">The <see cref="AzureQueueStorageBackgroundServiceOptions"/>.</param>
+        /// <param name="options">The <see cref="CloudQueueBackgroundServiceOptions"/>.</param>
         /// <param name="queue">The <see cref="CloudQueue"/>.</param>
         /// <param name="serializer">The <see cref="IBackgroundCommandSerializer"/>.</param>
         /// <param name="services">The <see cref="IServiceProvider"/> used to manage scopes.</param>
         /// <param name="logger">The <see cref="ILogger"/>.</param>
-        public AzureQueueStorageBackgroundService(
-            IOptions<AzureQueueStorageBackgroundServiceOptions> options,
+        public CloudQueueBackgroundService(
+            IOptions<CloudQueueBackgroundServiceOptions> options,
             CloudQueue queue,
             IBackgroundCommandSerializer serializer,
             IServiceProvider services,
-            ILogger<AzureQueueStorageBackgroundService> logger)
+            ILogger<CloudQueueBackgroundService> logger)
         {
             _options = options ?? throw new ArgumentNullException(nameof(options));
             _queue = queue ?? throw new ArgumentNullException(nameof(queue));

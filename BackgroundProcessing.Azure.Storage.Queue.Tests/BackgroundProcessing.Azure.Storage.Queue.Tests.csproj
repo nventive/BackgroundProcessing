@@ -20,7 +20,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\BackgroundProcessing.Core\BackgroundProcessing.Core.csproj" />
-    <ProjectReference Include="..\BackgroundProcessing.Azure\BackgroundProcessing.Azure.csproj" />
+    <ProjectReference Include="..\BackgroundProcessing.Azure.Storage.Queue\BackgroundProcessing.Azure.Storage.Queue.csproj" />
   </ItemGroup>
 
 </Project>

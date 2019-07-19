@@ -20,9 +20,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BackgroundProcessing.Core",
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BackgroundProcessing.Core.Tests", "BackgroundProcessing.Core.Tests\BackgroundProcessing.Core.Tests.csproj", "{789576E5-6CC3-47BF-A013-32394FFBF3D1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BackgroundProcessing.Azure", "BackgroundProcessing.Azure\BackgroundProcessing.Azure.csproj", "{35651C04-24C3-4B0E-91D1-9CAEDAE20BC8}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BackgroundProcessing.Azure.Storage.Queue", "BackgroundProcessing.Azure.Storage.Queue\BackgroundProcessing.Azure.Storage.Queue.csproj", "{35651C04-24C3-4B0E-91D1-9CAEDAE20BC8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BackgroundProcessing.Azure.Tests", "BackgroundProcessing.Azure.Tests\BackgroundProcessing.Azure.Tests.csproj", "{2883098E-DE57-4EFF-9BFA-78DB42A86CDF}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BackgroundProcessing.Azure.Storage.Queue.Tests", "BackgroundProcessing.Azure.Storage.Queue.Tests\BackgroundProcessing.Azure.Storage.Queue.Tests.csproj", "{2883098E-DE57-4EFF-9BFA-78DB42A86CDF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

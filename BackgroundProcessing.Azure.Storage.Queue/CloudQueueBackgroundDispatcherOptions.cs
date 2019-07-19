@@ -3,12 +3,12 @@ using BackgroundProcessing.Core;
 using Microsoft.Azure.Storage;
 using Microsoft.Azure.Storage.Queue;
 
-namespace BackgroundProcessing.Azure.QueueStorage
+namespace BackgroundProcessing.Azure.Storage.Queue
 {
     /// <summary>
-    /// Options for <see cref="AzureQueueStorageBackgroundDispatcher"/>.
+    /// Options for <see cref="CloudQueueBackgroundDispatcher"/>.
     /// </summary>
-    public class AzureQueueStorageBackgroundDispatcherOptions
+    public class CloudQueueBackgroundDispatcherOptions
     {
         /// <summary>
         /// Gets or sets the message TTL.

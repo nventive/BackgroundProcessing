@@ -6,12 +6,12 @@ using BackgroundProcessing.Core;
 using Microsoft.Azure.Storage;
 using Microsoft.Azure.Storage.Queue;
 
-namespace BackgroundProcessing.Azure.QueueStorage
+namespace BackgroundProcessing.Azure.Storage.Queue
 {
     /// <summary>
-    /// Options for <see cref="AzureQueueStorageBackgroundService"/>.
+    /// Options for <see cref="CloudQueueBackgroundService"/>.
     /// </summary>
-    public class AzureQueueStorageBackgroundServiceOptions
+    public class CloudQueueBackgroundServiceOptions
     {
         private static readonly Func<TimeSpan, TimeSpan> DefaultPollingFrequency = new Func<TimeSpan, TimeSpan>(x =>
         {
