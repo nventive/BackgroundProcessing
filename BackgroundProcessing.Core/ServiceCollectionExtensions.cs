@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Reflection;
 using BackgroundProcessing.Core;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -65,9 +66,17 @@ namespace Microsoft.Extensions.DependencyInjection
         /// Use only for POCs or unit-test, as it does not provide any retry or persistence mechanism.
         /// </summary>
         /// <param name="services">The <see cref="IServiceCollection"/> to configure.</param>
+        /// <param name="configureOptions">Configure the <see cref="ConcurrentQueueDispatcherBackgroundServiceOptions"/>.</param>
         /// <returns>The configured <see cref="IServiceCollection"/>.</returns>
-        public static IServiceCollection AddHostingServiceConcurrentQueueBackgroundProcessing(this IServiceCollection services)
+        public static IServiceCollection AddHostingServiceConcurrentQueueBackgroundProcessing(
+            this IServiceCollection services,
+            Action<ConcurrentQueueDispatcherBackgroundServiceOptions> configureOptions = null)
         {
+            if (configureOptions != null)
+            {
+                services.Configure(configureOptions);
+            }
+
             services.TryAddScoped<IBackgroundProcessor, ServiceProviderBackgroundProcessor>();
 
             services.AddSingleton<ConcurrentQueueDispatcherBackgroundService>();

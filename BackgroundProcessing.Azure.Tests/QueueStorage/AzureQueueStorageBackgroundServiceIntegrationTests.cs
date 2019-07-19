@@ -46,6 +46,7 @@ namespace BackgroundProcessing.Azure.Tests.QueueStorage
                 }
 
                 await Task.Delay(2000);
+                await host.StopAsync();
             }
 
             StorageQueueIntegrationTestsCommandHandler.Commands.Should().BeEquivalentTo(commands);

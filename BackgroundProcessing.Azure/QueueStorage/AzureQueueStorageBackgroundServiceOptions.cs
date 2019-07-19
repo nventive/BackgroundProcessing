@@ -10,10 +10,36 @@ namespace BackgroundProcessing.Azure.QueueStorage
     /// </summary>
     public class AzureQueueStorageBackgroundServiceOptions
     {
+        private static readonly Func<TimeSpan, TimeSpan> DefaultPollingFrequency = new Func<TimeSpan, TimeSpan>(x =>
+        {
+            var next = new TimeSpan((long)(x.Ticks * 1.3));
+            return next > TimeSpan.FromMinutes(1) ? TimeSpan.FromMinutes(1) : next;
+        });
+
         /// <summary>
-        /// Gets or sets the polling interval. Defaults to 50 milliseconds.
+        /// Gets or sets the degree of parallelism in the background processing.
+        /// Defaults to the CPU count.
         /// </summary>
-        public TimeSpan PollingInterval { get; set; } = TimeSpan.FromMilliseconds(50);
+        public int DegreeOfParallelism { get; set; } = Environment.ProcessorCount;
+
+        /// <summary>
+        /// Gets or sets the batch size when retrieving messages.
+        /// Defaults to the CPU count.
+        /// </summary>
+        public int MessagesBatchSize { get; set; } = Environment.ProcessorCount;
+
+        /// <summary>
+        /// Gets or sets the initial queue polling frequency when there are messages.
+        /// Defaults to 1 second.
+        /// </summary>
+        public TimeSpan PollingFrequency { get; set; } = TimeSpan.FromSeconds(1);
+
+        /// <summary>
+        /// Gets or sets the algorithm to determine the next polling frequency.
+        /// Default strategy: multiply previous by 1.3, with a maximum of 1 minute.
+        /// The next polling frequency is reset to <see cref="PollingFrequency"/> when a new message arrives.
+        /// </summary>
+        public Func<TimeSpan, TimeSpan> NextPollingFrequency { get; set; } = DefaultPollingFrequency;
 
         /// <summary>
         /// Gets or sets the max expected run time for handlers.

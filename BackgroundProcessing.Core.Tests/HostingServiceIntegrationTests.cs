@@ -28,7 +28,8 @@ namespace BackgroundProcessing.Core.Tests
             using (var host = new HostBuilder()
                 .ConfigureServices(services =>
                 {
-                    services.AddSingleton<ILogger<ConcurrentQueueDispatcherBackgroundService>>(_ => new XunitLogger<ConcurrentQueueDispatcherBackgroundService>(_output));
+                    services
+                        .AddSingleton<ILogger<ConcurrentQueueDispatcherBackgroundService>>(_ => new XunitLogger<ConcurrentQueueDispatcherBackgroundService>(_output));
                     services
                         .AddHostingServiceConcurrentQueueBackgroundProcessing()
                         .AddBackgroundCommandHandlersFromAssemblyContaining<HostingServiceIntegrationTests>();
@@ -42,7 +43,7 @@ namespace BackgroundProcessing.Core.Tests
                     await dispatcher.DispatchAsync(command);
                 }
 
-                await Task.Delay(100);
+                await host.StopAsync();
             }
 
             HostingServiceIntegrationTestsCommandHandler.Commands.Should().BeEquivalentTo(commands);

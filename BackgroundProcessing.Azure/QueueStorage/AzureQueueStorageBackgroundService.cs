@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Threading.Tasks.Dataflow;
 using BackgroundProcessing.Core;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -48,39 +50,63 @@ namespace BackgroundProcessing.Azure.QueueStorage
         [SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "There is no good way to manage errors at the moment.")]
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
+            var options = _options.Value;
+
+            var processMessagesActionBlock = new ActionBlock<CloudQueueMessage>(
+                async message =>
+                {
+                    var command = await _serializer.DeserializeAsync(message.AsString);
+
+                    try
+                    {
+                        using (var handlerRuntimeCancellationTokenSource = new CancellationTokenSource(options.MaxHandlerRuntime))
+                        using (var combinedCancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(stoppingToken, handlerRuntimeCancellationTokenSource.Token))
+                        using (var scope = _services.CreateScope())
+                        {
+                            var processor = scope.ServiceProvider.GetRequiredService<IBackgroundProcessor>();
+                            await processor.ProcessAsync(command, combinedCancellationTokenSource.Token);
+                            combinedCancellationTokenSource.Token.ThrowIfCancellationRequested();
+                            await _queue.DeleteMessageAsync(message);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError($"An error occured while processing {command}: {ex.Message}", ex);
+                    }
+                },
+                new ExecutionDataflowBlockOptions
+                {
+                    CancellationToken = stoppingToken,
+                    BoundedCapacity = options.DegreeOfParallelism,
+                    MaxDegreeOfParallelism = DataflowBlockOptions.Unbounded,
+                });
+
+            var currentPollingFrequency = options.PollingFrequency;
             while (!stoppingToken.IsCancellationRequested)
             {
-                var options = _options.Value;
-                await Task.Delay(options.PollingInterval);
-                var message = await _queue.GetMessageAsync(
+                var messages = await _queue.GetMessagesAsync(
+                    messageCount: options.MessagesBatchSize,
                     visibilityTimeout: options.MaxHandlerRuntime.Add(options.HandlerCancellationGraceDelay),
                     options: options.QueueRequestOptions,
                     operationContext: options.OperationContextBuilder != null ? options.OperationContextBuilder() : null);
 
-                if (message == null)
+                if (!messages.Any())
                 {
+                    await Task.Delay(currentPollingFrequency);
+                    currentPollingFrequency = options.NextPollingFrequency(currentPollingFrequency);
                     continue;
                 }
 
-                var command = await _serializer.DeserializeAsync(message.AsString);
+                currentPollingFrequency = options.PollingFrequency;
 
-                try
+                foreach (var message in messages)
                 {
-                    using (var handlerRuntimeCancellationTokenSource = new CancellationTokenSource(options.MaxHandlerRuntime))
-                    using (var combinedCancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(stoppingToken, handlerRuntimeCancellationTokenSource.Token))
-                    using (var scope = _services.CreateScope())
-                    {
-                        var processor = scope.ServiceProvider.GetRequiredService<IBackgroundProcessor>();
-                        await processor.ProcessAsync(command, combinedCancellationTokenSource.Token);
-                        combinedCancellationTokenSource.Token.ThrowIfCancellationRequested();
-                        await _queue.DeleteMessageAsync(message);
-                    }
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError($"An error occured while processing {command}: {ex.Message}", ex);
+                    await processMessagesActionBlock.SendAsync(message, stoppingToken);
                 }
             }
+
+            processMessagesActionBlock.Complete();
+            await processMessagesActionBlock.Completion;
         }
     }
 }

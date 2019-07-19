@@ -12,5 +12,8 @@ namespace BackgroundProcessing.Core
 
         /// <inheritdoc />
         public DateTimeOffset Timestamp { get; set; } = DateTimeOffset.UtcNow;
+
+        /// <inheritdoc />
+        public override string ToString() => $"{GetType().Name} {Id}";
     }
 }
