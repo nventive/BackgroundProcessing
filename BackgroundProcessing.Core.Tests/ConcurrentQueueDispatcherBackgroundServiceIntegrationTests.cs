@@ -32,8 +32,8 @@ namespace BackgroundProcessing.Core.Tests
                     services
                         .AddSingleton<ILogger<ConcurrentQueueDispatcherBackgroundService>>(_ => new XunitLogger<ConcurrentQueueDispatcherBackgroundService>(_output));
                     services
-                        .AddHostingServiceConcurrentQueueBackgroundProcessing()
-                        .AddBackgroundCommandHandlersFromAssemblyContaining<ConcurrentQueueDispatcherBackgroundServiceIntegrationTests>();
+                        .AddBackgroundCommandHandlersFromAssemblyContaining<ConcurrentQueueDispatcherBackgroundServiceIntegrationTests>()
+                        .AddHostingServiceConcurrentQueueBackgroundProcessing();
                 })
                 .Start())
             {
@@ -62,6 +62,7 @@ namespace BackgroundProcessing.Core.Tests
                     services
                         .AddSingleton<ILogger<ConcurrentQueueDispatcherBackgroundService>>(_ => new XunitLogger<ConcurrentQueueDispatcherBackgroundService>(_output));
                     services
+                        .AddBackgroundCommandHandlersFromAssemblyContaining<ConcurrentQueueDispatcherBackgroundServiceIntegrationTests>()
                         .AddHostingServiceConcurrentQueueBackgroundProcessing(options =>
                         {
                             options.ErrorHandler = async (cmd, ex, ct) =>
@@ -69,8 +70,7 @@ namespace BackgroundProcessing.Core.Tests
                                 caughtCommand = cmd;
                                 caughtException = ex;
                             };
-                        })
-                        .AddBackgroundCommandHandlersFromAssemblyContaining<ConcurrentQueueDispatcherBackgroundServiceIntegrationTests>();
+                        });
                 })
                 .Start())
             {

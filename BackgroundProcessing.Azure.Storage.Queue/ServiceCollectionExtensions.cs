@@ -20,7 +20,7 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <param name="services">The <see cref="IServiceCollection"/> to configure.</param>
         /// <param name="configureOptions">To configure the <see cref="CloudQueueBackgroundDispatcherOptions"/> by code.</param>
         /// <returns>The configured <see cref="IServiceCollection"/>.</returns>
-        public static IServiceCollection AddAzureStorageQueueBackgroundDispatcher(
+        public static BackgroundBuilder AddAzureStorageQueueBackgroundDispatcher(
             this IServiceCollection services,
             Action<CloudQueueBackgroundDispatcherOptions> configureOptions = null)
         {
@@ -31,7 +31,7 @@ namespace Microsoft.Extensions.DependencyInjection
 
             services.TryAddSingleton<IBackgroundCommandSerializer, JsonNetBackgroundCommandSerializer>();
             services.AddScoped<IBackgroundDispatcher, CloudQueueBackgroundDispatcher>();
-            return services;
+            return new BackgroundBuilder(services);
         }
 
         /// <summary>
@@ -40,7 +40,7 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <param name="services">The <see cref="IServiceCollection"/> to configure.</param>
         /// <param name="configureOptions">To configure the <see cref="CloudQueueBackgroundServiceOptions"/> by code.</param>
         /// <returns>The configured <see cref="IServiceCollection"/>.</returns>
-        public static IServiceCollection AddAzureStorageQueueBackgroundProcessing(
+        public static BackgroundBuilder AddAzureStorageQueueBackgroundProcessing(
             this IServiceCollection services,
             Action<CloudQueueBackgroundServiceOptions> configureOptions = null)
         {
@@ -53,7 +53,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.TryAddScoped<IBackgroundProcessor, ServiceProviderBackgroundProcessor>();
             services.AddHostedService<CloudQueueBackgroundService>();
 
-            return services;
+            return new BackgroundBuilder(services);
         }
 
         /// <summary>
@@ -62,13 +62,13 @@ namespace Microsoft.Extensions.DependencyInjection
         /// </summary>
         /// <param name="services">The <see cref="IServiceCollection"/> to configure.</param>
         /// <returns>The configured <see cref="IServiceCollection"/>.</returns>
-        public static IServiceCollection AddAzureFunctionsQueueStorageProcessing(this IServiceCollection services)
+        public static BackgroundBuilder AddAzureFunctionsQueueStorageProcessing(this IServiceCollection services)
         {
             services.TryAddSingleton<IBackgroundCommandSerializer, JsonNetBackgroundCommandSerializer>();
             services.TryAddScoped<IBackgroundProcessor, ServiceProviderBackgroundProcessor>();
             services.AddScoped<AzureFunctionsQueueStorageHandler>();
 
-            return services;
+            return new BackgroundBuilder(services);
         }
     }
 }

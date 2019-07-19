@@ -67,8 +67,8 @@ namespace Microsoft.Extensions.DependencyInjection
         /// </summary>
         /// <param name="services">The <see cref="IServiceCollection"/> to configure.</param>
         /// <param name="configureOptions">Configure the <see cref="ConcurrentQueueDispatcherBackgroundServiceOptions"/>.</param>
-        /// <returns>The configured <see cref="IServiceCollection"/>.</returns>
-        public static IServiceCollection AddHostingServiceConcurrentQueueBackgroundProcessing(
+        /// <returns>The <see cref="BackgroundBuilder"/>.</returns>
+        public static BackgroundBuilder AddHostingServiceConcurrentQueueBackgroundProcessing(
             this IServiceCollection services,
             Action<ConcurrentQueueDispatcherBackgroundServiceOptions> configureOptions = null)
         {
@@ -83,7 +83,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddTransient<IHostedService>(sp => sp.GetRequiredService<ConcurrentQueueDispatcherBackgroundService>());
             services.AddSingleton<IBackgroundDispatcher>(sp => sp.GetRequiredService<ConcurrentQueueDispatcherBackgroundService>());
 
-            return services;
+            return new BackgroundBuilder(services);
         }
     }
 }

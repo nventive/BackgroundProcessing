@@ -34,9 +34,10 @@ namespace BackgroundProcessing.Azure.Storage.Queue.Tests
 
                             return queue;
                         })
+                        .AddBackgroundCommandHandlersFromAssemblyContaining<CloudQueueBackgroundServiceIntegrationTests>()
                         .AddAzureStorageQueueBackgroundDispatcher()
-                        .AddAzureStorageQueueBackgroundProcessing()
-                        .AddBackgroundCommandHandlersFromAssemblyContaining<CloudQueueBackgroundServiceIntegrationTests>();
+                        .Services
+                        .AddAzureStorageQueueBackgroundProcessing();
                 })
                 .Start())
             {
@@ -75,7 +76,9 @@ namespace BackgroundProcessing.Azure.Storage.Queue.Tests
 
                             return queue;
                         })
+                        .AddBackgroundCommandHandlersFromAssemblyContaining<CloudQueueBackgroundServiceIntegrationTests>()
                         .AddAzureStorageQueueBackgroundDispatcher()
+                        .Services
                         .AddAzureStorageQueueBackgroundProcessing(options =>
                         {
                             options.ErrorHandler = async (cmd, ex, ct) =>
@@ -83,8 +86,7 @@ namespace BackgroundProcessing.Azure.Storage.Queue.Tests
                                 caughtCommand = cmd;
                                 caughtException = ex;
                             };
-                        })
-                        .AddBackgroundCommandHandlersFromAssemblyContaining<CloudQueueBackgroundServiceIntegrationTests>();
+                        });
                 })
                 .Start())
             {
