@@ -38,24 +38,13 @@ namespace BackgroundProcessing.Core
                 throw new BackgroundProcessingException($"Unable to find a suitable handler for command {command} ({command.GetType()}).");
             }
 
-            try
+            var handleMethod = handlerType.GetMethod("HandleAsync", new[] { command.GetType(), typeof(CancellationToken) });
+            if (handleMethod == null)
             {
-                var handleMethod = handlerType.GetMethod("HandleAsync", new[] { command.GetType(), typeof(CancellationToken) });
-                if (handleMethod == null)
-                {
-                    throw new BackgroundProcessingException($"Unable to find proper handle method in {handlerType}.");
-                }
+                throw new BackgroundProcessingException($"Unable to find proper handle method in {handlerType}.");
+            }
 
-                handleMethod.Invoke(handler, new object[] { command, cancellationToken });
-            }
-            catch (BackgroundProcessingException)
-            {
-                throw;
-            }
-            catch (Exception ex)
-            {
-                throw new BackgroundProcessingException($"Error while executing command {command}: {ex.Message}", ex);
-            }
+            await (handleMethod.Invoke(handler, new object[] { command, cancellationToken }) as Task);
         }
     }
 }

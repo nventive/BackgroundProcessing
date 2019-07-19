@@ -36,6 +36,19 @@ namespace BackgroundProcessing.Core.Tests
             handler.ReceivedCommand.Should().BeSameAs(command);
         }
 
+        [Fact]
+        public async Task ItShouldRelayExceptions()
+        {
+            var serviceProvider = new ServiceCollection()
+                .AddSingleton<IBackgroundCommandHandler<TestErrorCommand>, TestErrorCommandHandler>()
+                .BuildServiceProvider();
+            var command = new TestErrorCommand();
+            var processor = new ServiceProviderBackgroundProcessor(serviceProvider);
+
+            Func<Task> act = async () => await processor.ProcessAsync(command);
+            act.Should().Throw<Exception>().WithMessage(command.Id);
+        }
+
         private class TestCommand : BackgroundCommand
         {
         }
@@ -47,6 +60,18 @@ namespace BackgroundProcessing.Core.Tests
             public async Task HandleAsync(TestCommand command, CancellationToken cancellationToken = default)
             {
                 ReceivedCommand = command;
+            }
+        }
+
+        private class TestErrorCommand : BackgroundCommand
+        {
+        }
+
+        private class TestErrorCommandHandler : IBackgroundCommandHandler<TestErrorCommand>
+        {
+            public async Task HandleAsync(TestErrorCommand command, CancellationToken cancellationToken = default)
+            {
+                throw new Exception(command.Id);
             }
         }
     }

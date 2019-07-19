@@ -55,10 +55,11 @@ namespace BackgroundProcessing.Azure.QueueStorage
             var processMessagesActionBlock = new ActionBlock<CloudQueueMessage>(
                 async message =>
                 {
-                    var command = await _serializer.DeserializeAsync(message.AsString);
-
+                    IBackgroundCommand command = null;
                     try
                     {
+                        command = await _serializer.DeserializeAsync(message.AsString);
+
                         using (var handlerRuntimeCancellationTokenSource = new CancellationTokenSource(options.MaxHandlerRuntime))
                         using (var combinedCancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(stoppingToken, handlerRuntimeCancellationTokenSource.Token))
                         using (var scope = _services.CreateScope())
@@ -72,6 +73,7 @@ namespace BackgroundProcessing.Azure.QueueStorage
                     catch (Exception ex)
                     {
                         _logger.LogError($"An error occured while processing {command}: {ex.Message}", ex);
+                        await options.ErrorHandler?.Invoke(command, ex, stoppingToken);
                     }
                 },
                 new ExecutionDataflowBlockOptions

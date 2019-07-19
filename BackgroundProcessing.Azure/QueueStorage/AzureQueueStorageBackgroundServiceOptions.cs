@@ -1,5 +1,8 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Threading;
+using System.Threading.Tasks;
+using BackgroundProcessing.Core;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Queue;
 
@@ -12,6 +15,11 @@ namespace BackgroundProcessing.Azure.QueueStorage
     {
         private static readonly Func<TimeSpan, TimeSpan> DefaultPollingFrequency = new Func<TimeSpan, TimeSpan>(x =>
         {
+            if (Debugger.IsAttached)
+            {
+                return TimeSpan.FromSeconds(1);
+            }
+
             var next = new TimeSpan((long)(x.Ticks * 1.3));
             return next > TimeSpan.FromMinutes(1) ? TimeSpan.FromMinutes(1) : next;
         });
@@ -37,6 +45,7 @@ namespace BackgroundProcessing.Azure.QueueStorage
         /// <summary>
         /// Gets or sets the algorithm to determine the next polling frequency.
         /// Default strategy: multiply previous by 1.3, with a maximum of 1 minute.
+        /// If a debugger is attached, it polls every 1 second no matter what.
         /// The next polling frequency is reset to <see cref="PollingFrequency"/> when a new message arrives.
         /// </summary>
         public Func<TimeSpan, TimeSpan> NextPollingFrequency { get; set; } = DefaultPollingFrequency;
@@ -65,5 +74,10 @@ namespace BackgroundProcessing.Azure.QueueStorage
         /// Gets or sets the <see cref="OperationContext"/>.
         /// </summary>
         public Func<OperationContext> OperationContextBuilder { get; set; }
+
+        /// <summary>
+        /// Gets or sets a handler that will be notified when an error occurs.
+        /// </summary>
+        public Func<IBackgroundCommand, Exception, CancellationToken, Task> ErrorHandler { get; set; }
     }
 }
