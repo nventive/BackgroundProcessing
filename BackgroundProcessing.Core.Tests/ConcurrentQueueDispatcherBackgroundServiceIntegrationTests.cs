@@ -1,7 +1,10 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using BackgroundProcessing.Core.Testing;
 using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -30,10 +33,12 @@ namespace BackgroundProcessing.Core.Tests
                 .ConfigureServices(services =>
                 {
                     services
+                        .AddSingleton(sp => _output)
                         .AddSingleton<ILogger<ConcurrentQueueDispatcherBackgroundService>>(_ => new XunitLogger<ConcurrentQueueDispatcherBackgroundService>(_output));
                     services
                         .AddBackgroundCommandHandlersFromAssemblyContaining<ConcurrentQueueDispatcherBackgroundServiceIntegrationTests>()
-                        .AddHostingServiceConcurrentQueueBackgroundProcessing();
+                        .AddHostingServiceConcurrentQueueBackgroundProcessing()
+                        .AddGatedBackgroundProcessorDecorator(commands.Count());
                 })
                 .Start())
             {
@@ -44,10 +49,12 @@ namespace BackgroundProcessing.Core.Tests
                     await dispatcher.DispatchAsync(command);
                 }
 
-                await host.StopAsync();
-            }
+                var awaiter = host.Services.GetRequiredService<GatedBackgroundProcessorAwaiter>();
+                awaiter.Wait(TimeSpan.FromSeconds(30));
+                _output.WriteLine($"Wait is over {awaiter}");
 
-            HostingServiceIntegrationTestsCommandHandler.Commands.Should().BeEquivalentTo(commands);
+                HostingServiceIntegrationTestsCommandHandler.Commands.Should().HaveCount(commands.Count());
+            }
         }
 
         [Fact]
@@ -60,6 +67,7 @@ namespace BackgroundProcessing.Core.Tests
                 .ConfigureServices(services =>
                 {
                     services
+                        .AddSingleton(sp => _output)
                         .AddSingleton<ILogger<ConcurrentQueueDispatcherBackgroundService>>(_ => new XunitLogger<ConcurrentQueueDispatcherBackgroundService>(_output));
                     services
                         .AddBackgroundCommandHandlersFromAssemblyContaining<ConcurrentQueueDispatcherBackgroundServiceIntegrationTests>()
@@ -67,21 +75,24 @@ namespace BackgroundProcessing.Core.Tests
                         {
                             options.ErrorHandler = async (cmd, ex, ct) =>
                             {
+                                _output.WriteLine($"ErrorHandler: {cmd}");
                                 caughtCommand = cmd;
                                 caughtException = ex;
                             };
-                        });
+                        })
+                        .AddGatedBackgroundProcessorDecorator(1);
                 })
                 .Start())
             {
                 var dispatcher = host.Services.GetRequiredService<IBackgroundDispatcher>();
                 await dispatcher.DispatchAsync(command);
-                await Task.Delay(200);
-                await host.StopAsync();
-            }
+                var awaiter = host.Services.GetRequiredService<GatedBackgroundProcessorAwaiter>();
+                awaiter.Wait(TimeSpan.FromSeconds(30));
+                await Task.Delay(TimeSpan.FromMilliseconds(100));
 
-            caughtCommand.Should().Be(command);
-            caughtException.Message.Should().Be(command.Id);
+                caughtCommand.Should().Be(command);
+                caughtException.Message.Should().Be(command.Id);
+            }
         }
 
         private class HostingServiceIntegrationTestsCommand : BackgroundCommand
@@ -90,11 +101,19 @@ namespace BackgroundProcessing.Core.Tests
 
         private class HostingServiceIntegrationTestsCommandHandler : IBackgroundCommandHandler<HostingServiceIntegrationTestsCommand>
         {
-            public static readonly IList<HostingServiceIntegrationTestsCommand> Commands = new List<HostingServiceIntegrationTestsCommand>();
+            public static readonly ConcurrentBag<HostingServiceIntegrationTestsCommand> Commands = new ConcurrentBag<HostingServiceIntegrationTestsCommand>();
+            private readonly ITestOutputHelper _output;
+
+            public HostingServiceIntegrationTestsCommandHandler(ITestOutputHelper output)
+            {
+                _output = output ?? throw new ArgumentNullException(nameof(output));
+            }
 
             public async Task HandleAsync(HostingServiceIntegrationTestsCommand command, CancellationToken cancellationToken = default)
             {
+                _output.WriteLine($"Processing {command}");
                 Commands.Add(command);
+                _output.WriteLine($"Processed {command}");
             }
         }
 
@@ -104,8 +123,16 @@ namespace BackgroundProcessing.Core.Tests
 
         private class HostingServiceIntegrationTestsErrorCommandHandler : IBackgroundCommandHandler<HostingServiceIntegrationTestsErrorCommand>
         {
+            private readonly ITestOutputHelper _output;
+
+            public HostingServiceIntegrationTestsErrorCommandHandler(ITestOutputHelper output)
+            {
+                _output = output ?? throw new ArgumentNullException(nameof(output));
+            }
+
             public async Task HandleAsync(HostingServiceIntegrationTestsErrorCommand command, CancellationToken cancellationToken = default)
             {
+                _output.WriteLine($"Throw exception: {command}");
                 throw new Exception(command.Id);
             }
         }

@@ -1,7 +1,6 @@
 ﻿using System;
-using Microsoft.Extensions.DependencyInjection;
 
-namespace BackgroundProcessing.Core
+namespace Microsoft.Extensions.DependencyInjection
 {
     /// <summary>
     /// Allows enrichment of the configuration builder to specify dependencies order.
