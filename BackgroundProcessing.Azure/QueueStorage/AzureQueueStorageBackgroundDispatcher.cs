@@ -2,8 +2,8 @@
 using System.Threading;
 using System.Threading.Tasks;
 using BackgroundProcessing.Core;
+using Microsoft.Azure.Storage.Queue;
 using Microsoft.Extensions.Options;
-using Microsoft.WindowsAzure.Storage.Queue;
 
 namespace BackgroundProcessing.Azure.QueueStorage
 {

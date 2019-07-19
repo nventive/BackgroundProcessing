@@ -5,11 +5,11 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
 using BackgroundProcessing.Core;
+using Microsoft.Azure.Storage.Queue;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Microsoft.WindowsAzure.Storage.Queue;
 
 namespace BackgroundProcessing.Azure.QueueStorage
 {

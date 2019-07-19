@@ -2,9 +2,9 @@
 using BackgroundProcessing.Azure.QueueStorage;
 using BackgroundProcessing.Core;
 using BackgroundProcessing.Core.Serializers;
+using Microsoft.Azure.Storage.Queue;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
-using Microsoft.WindowsAzure.Storage.Queue;
 
 namespace Microsoft.Extensions.DependencyInjection
 {

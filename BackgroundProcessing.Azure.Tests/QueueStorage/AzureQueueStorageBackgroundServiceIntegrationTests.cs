@@ -4,9 +4,10 @@ using System.Threading;
 using System.Threading.Tasks;
 using BackgroundProcessing.Core;
 using FluentAssertions;
+using Microsoft.Azure.Storage;
+using Microsoft.Azure.Storage.Queue;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.WindowsAzure.Storage;
 using Xunit;
 
 namespace BackgroundProcessing.Azure.Tests.QueueStorage
