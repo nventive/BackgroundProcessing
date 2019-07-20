@@ -1,4 +1,5 @@
 ﻿using System;
+using BackgroundProcessing.Core;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
@@ -20,5 +21,29 @@ namespace Microsoft.Extensions.DependencyInjection
         /// Gets the <see cref="IServiceCollection"/>.
         /// </summary>
         public IServiceCollection Services { get; }
+
+        /// <summary>
+        /// Decorate the currently registered <see cref="IBackgroundDispatcher"/>.
+        /// </summary>
+        /// <typeparam name="TDecorator">The decorator type.</typeparam>
+        /// <returns>The configured <see cref="BackgroundBuilder"/>.</returns>
+        public BackgroundBuilder DecorateDispatcher<TDecorator>()
+            where TDecorator : IBackgroundDispatcher
+        {
+            Services.Decorate<IBackgroundDispatcher, TDecorator>();
+            return this;
+        }
+
+        /// <summary>
+        /// Decorate the currently registered <see cref="IBackgroundProcessor"/>.
+        /// </summary>
+        /// <typeparam name="TDecorator">The decorator type.</typeparam>
+        /// <returns>The configured <see cref="BackgroundBuilder"/>.</returns>
+        public BackgroundBuilder DecorateProcessor<TDecorator>()
+            where TDecorator : IBackgroundProcessor
+        {
+            Services.Decorate<IBackgroundProcessor, TDecorator>();
+            return this;
+        }
     }
 }

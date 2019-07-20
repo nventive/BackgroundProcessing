@@ -8,15 +8,15 @@ namespace BackgroundProcessing.Core.Testing
     /// <summary>
     /// Allows waiting for commands to be processed.
     /// </summary>
-    public sealed class GatedBackgroundProcessorAwaiter : IDisposable
+    public sealed class CountdownEventBackgroundProcessorAwaiter : IDisposable
     {
         private readonly CountdownEvent _countDownEvent;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="GatedBackgroundProcessorAwaiter"/> class.
+        /// Initializes a new instance of the <see cref="CountdownEventBackgroundProcessorAwaiter"/> class.
         /// </summary>
         /// <param name="numberOfCommandsToWaitFor">The number of commands to wait for before releasing.</param>
-        public GatedBackgroundProcessorAwaiter(
+        public CountdownEventBackgroundProcessorAwaiter(
             int numberOfCommandsToWaitFor)
         {
             _countDownEvent = new CountdownEvent(numberOfCommandsToWaitFor);

@@ -8,19 +8,19 @@ namespace BackgroundProcessing.Core.Testing
     /// <see cref="IBackgroundProcessor"/> decorator that can wait for a number of invocation.
     /// This is very useful in testing scenarios. DO NOT USE IT IN PRODUCTION.
     /// </summary>
-    public sealed class GatedBackgroundProcessorDecorator : IBackgroundProcessor
+    public sealed class CountdownEventBackgroundProcessorDecorator : IBackgroundProcessor
     {
         private readonly IBackgroundProcessor _wrappedProcessor;
-        private readonly GatedBackgroundProcessorAwaiter _awaiter;
+        private readonly CountdownEventBackgroundProcessorAwaiter _awaiter;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="GatedBackgroundProcessorDecorator"/> class.
+        /// Initializes a new instance of the <see cref="CountdownEventBackgroundProcessorDecorator"/> class.
         /// </summary>
         /// <param name="wrappedProcessor">The wrapped <see cref="IBackgroundProcessor"/>.</param>
-        /// <param name="awaiter">The <see cref="GatedBackgroundProcessorAwaiter"/>.</param>
-        public GatedBackgroundProcessorDecorator(
+        /// <param name="awaiter">The <see cref="CountdownEventBackgroundProcessorAwaiter"/>.</param>
+        public CountdownEventBackgroundProcessorDecorator(
             IBackgroundProcessor wrappedProcessor,
-            GatedBackgroundProcessorAwaiter awaiter)
+            CountdownEventBackgroundProcessorAwaiter awaiter)
         {
             _wrappedProcessor = wrappedProcessor ?? throw new ArgumentNullException(nameof(wrappedProcessor));
             _awaiter = awaiter;

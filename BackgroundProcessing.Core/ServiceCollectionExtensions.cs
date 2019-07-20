@@ -34,12 +34,12 @@ namespace Microsoft.Extensions.DependencyInjection
         {
             if (services == null)
             {
-                throw new System.ArgumentNullException(nameof(services));
+                throw new ArgumentNullException(nameof(services));
             }
 
             if (assembly == null)
             {
-                throw new System.ArgumentNullException(nameof(assembly));
+                throw new ArgumentNullException(nameof(assembly));
             }
 
             var handlerTypes = assembly

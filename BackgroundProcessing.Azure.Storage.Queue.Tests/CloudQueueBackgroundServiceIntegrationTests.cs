@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using BackgroundProcessing.Core;
 using BackgroundProcessing.Core.Testing;
 using FluentAssertions;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Xunit;
@@ -21,6 +22,12 @@ namespace BackgroundProcessing.Azure.Storage.Queue.Tests
             var commands = new[] { new CloudQueueIntegrationTestsCommand(), new CloudQueueIntegrationTestsCommand() };
 
             using (var host = new HostBuilder()
+                .ConfigureAppConfiguration((ctx, config) =>
+                {
+                    config
+                        .AddJsonFile("appsettings.json", true)
+                        .AddEnvironmentVariables();
+                })
                 .ConfigureServices(services =>
                 {
                     services
@@ -28,8 +35,8 @@ namespace BackgroundProcessing.Azure.Storage.Queue.Tests
                         .AddAzureStorageQueueBackgroundDispatcher()
                         .Services
                         .AddAzureStorageQueueBackgroundProcessing()
-                        .ConfigureCloudQueueUsingConnectionString("UseDevelopmentStorage=true", "bgtasks-integrationtests")
-                        .AddGatedBackgroundProcessorDecorator(commands.Count());
+                        .ConfigureCloudQueueUsingConnectionStringName("StorageQueue", "bgtasks-integrationtests")
+                        .AddCountdownEventBackgroundProcessorDecorator(commands.Count());
                 })
                 .Start())
             {
@@ -40,10 +47,53 @@ namespace BackgroundProcessing.Azure.Storage.Queue.Tests
                     await dispatcher.DispatchAsync(command);
                 }
 
-                var awaiter = host.Services.GetRequiredService<GatedBackgroundProcessorAwaiter>();
+                var awaiter = host.Services.GetRequiredService<CountdownEventBackgroundProcessorAwaiter>();
                 awaiter.Wait(TimeSpan.FromSeconds(30));
 
-                CloudQueueIntegrationTestsCommandHandler.Commands.Should().HaveCount(commands.Count());
+                CloudQueueIntegrationTestsCommandHandler.Commands.Should().HaveCountGreaterOrEqualTo(commands.Count());
+            }
+        }
+
+        [Fact]
+        public async Task ItShouldInvokeErrorHandler()
+        {
+            var command = new CloudQueueIntegrationTestsErrorCommand();
+            IBackgroundCommand caughtCommand = null;
+            Exception caughtException = null;
+
+            using (var countDownEvent = new CountdownEvent(1))
+            using (var host = new HostBuilder()
+                .ConfigureAppConfiguration((ctx, config) =>
+                {
+                    config
+                        .AddJsonFile("appsettings.json", true)
+                        .AddEnvironmentVariables();
+                })
+                .ConfigureServices(services =>
+                {
+                    services
+                        .AddBackgroundCommandHandlersFromAssemblyContaining<CloudQueueBackgroundServiceIntegrationTests>()
+                        .AddAzureStorageQueueBackgroundDispatcher()
+                        .Services
+                        .AddAzureStorageQueueBackgroundProcessing(options =>
+                        {
+                            options.ErrorHandler = async (cmd, ex, ct) =>
+                            {
+                                caughtCommand = cmd;
+                                caughtException = ex;
+                                countDownEvent.Signal();
+                            };
+                        })
+                        .ConfigureCloudQueueUsingConnectionStringName("StorageQueue", "bgtasks-integrationtests");
+                })
+                .Start())
+            {
+                var dispatcher = host.Services.GetRequiredService<IBackgroundDispatcher>();
+                await dispatcher.DispatchAsync(command);
+                countDownEvent.Wait(TimeSpan.FromSeconds(30));
+
+                caughtCommand.Should().BeEquivalentTo(command);
+                caughtException.Message.Should().Be(command.Id);
             }
         }
 
@@ -58,6 +108,18 @@ namespace BackgroundProcessing.Azure.Storage.Queue.Tests
             public async Task HandleAsync(CloudQueueIntegrationTestsCommand command, CancellationToken cancellationToken = default)
             {
                 Commands.Add(command);
+            }
+        }
+
+        private class CloudQueueIntegrationTestsErrorCommand : BackgroundCommand
+        {
+        }
+
+        private class CloudQueueIntegrationTestsErrorCommandHandler : IBackgroundCommandHandler<CloudQueueIntegrationTestsErrorCommand>
+        {
+            public async Task HandleAsync(CloudQueueIntegrationTestsErrorCommand command, CancellationToken cancellationToken = default)
+            {
+                throw new Exception(command.Id);
             }
         }
     }

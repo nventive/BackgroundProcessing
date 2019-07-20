@@ -38,7 +38,7 @@ namespace BackgroundProcessing.Core.Tests
                     services
                         .AddBackgroundCommandHandlersFromAssemblyContaining<ConcurrentQueueDispatcherBackgroundServiceIntegrationTests>()
                         .AddHostingServiceConcurrentQueueBackgroundProcessing()
-                        .AddGatedBackgroundProcessorDecorator(commands.Count());
+                        .AddCountdownEventBackgroundProcessorDecorator(commands.Count());
                 })
                 .Start())
             {
@@ -49,9 +49,8 @@ namespace BackgroundProcessing.Core.Tests
                     await dispatcher.DispatchAsync(command);
                 }
 
-                var awaiter = host.Services.GetRequiredService<GatedBackgroundProcessorAwaiter>();
+                var awaiter = host.Services.GetRequiredService<CountdownEventBackgroundProcessorAwaiter>();
                 awaiter.Wait(TimeSpan.FromSeconds(30));
-                _output.WriteLine($"Wait is over {awaiter}");
 
                 HostingServiceIntegrationTestsCommandHandler.Commands.Should().HaveCount(commands.Count());
             }
@@ -63,6 +62,8 @@ namespace BackgroundProcessing.Core.Tests
             var command = new HostingServiceIntegrationTestsErrorCommand();
             IBackgroundCommand caughtCommand = null;
             Exception caughtException = null;
+
+            using (var countDownEvent = new CountdownEvent(1))
             using (var host = new HostBuilder()
                 .ConfigureServices(services =>
                 {
@@ -75,20 +76,17 @@ namespace BackgroundProcessing.Core.Tests
                         {
                             options.ErrorHandler = async (cmd, ex, ct) =>
                             {
-                                _output.WriteLine($"ErrorHandler: {cmd}");
                                 caughtCommand = cmd;
                                 caughtException = ex;
+                                countDownEvent.Signal();
                             };
-                        })
-                        .AddGatedBackgroundProcessorDecorator(1);
+                        });
                 })
                 .Start())
             {
                 var dispatcher = host.Services.GetRequiredService<IBackgroundDispatcher>();
                 await dispatcher.DispatchAsync(command);
-                var awaiter = host.Services.GetRequiredService<GatedBackgroundProcessorAwaiter>();
-                awaiter.Wait(TimeSpan.FromSeconds(30));
-                await Task.Delay(TimeSpan.FromMilliseconds(100));
+                countDownEvent.Wait(TimeSpan.FromSeconds(30));
 
                 caughtCommand.Should().Be(command);
                 caughtException.Message.Should().Be(command.Id);
