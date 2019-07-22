@@ -62,6 +62,7 @@ namespace BackgroundProcessing.Azure.ApplicationInsights
                 var now = DateTimeOffset.UtcNow;
                 var stopwatch = Stopwatch.StartNew();
                 await _wrappedProcessor.ProcessAsync(command, cancellationToken);
+                stopwatch.Stop();
                 var eventTelemetry = new EventTelemetry(BackgroundCommandProcessedEventName);
                 eventTelemetry.Properties.Add(BackgroundCommandIdPropertyName, command.Id);
                 eventTelemetry.Metrics.Add(BackgroundCommandProcessTimeMetricName, stopwatch.ElapsedMilliseconds);
