@@ -2,6 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using BackgroundProcessing.Core;
+using Microsoft.Azure.Storage.Queue;
 
 namespace BackgroundProcessing.Azure.Storage.Queue
 {
@@ -24,6 +25,22 @@ namespace BackgroundProcessing.Azure.Storage.Queue
         {
             _serializer = serializer ?? throw new ArgumentNullException(nameof(serializer));
             _processor = processor ?? throw new ArgumentNullException(nameof(processor));
+        }
+
+        /// <summary>
+        /// Handles the <paramref name="message"/> from the queue trigger.
+        /// </summary>
+        /// <param name="message">The <see cref="CloudQueueMessage"/> to handle.</param>
+        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
+        /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
+        public async Task HandleAsync(CloudQueueMessage message, CancellationToken cancellationToken = default)
+        {
+            if (message == null)
+            {
+                throw new ArgumentNullException(nameof(message));
+            }
+
+            await HandleAsync(message.AsString, cancellationToken);
         }
 
         /// <summary>
