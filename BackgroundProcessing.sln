@@ -20,9 +20,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BackgroundProcessing.Core",
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BackgroundProcessing.Core.Tests", "BackgroundProcessing.Core.Tests\BackgroundProcessing.Core.Tests.csproj", "{789576E5-6CC3-47BF-A013-32394FFBF3D1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BackgroundProcessing.Azure.Storage.Queue", "BackgroundProcessing.Azure.Storage.Queue\BackgroundProcessing.Azure.Storage.Queue.csproj", "{35651C04-24C3-4B0E-91D1-9CAEDAE20BC8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BackgroundProcessing.Azure.Storage.Queue", "BackgroundProcessing.Azure.Storage.Queue\BackgroundProcessing.Azure.Storage.Queue.csproj", "{35651C04-24C3-4B0E-91D1-9CAEDAE20BC8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BackgroundProcessing.Azure.Storage.Queue.Tests", "BackgroundProcessing.Azure.Storage.Queue.Tests\BackgroundProcessing.Azure.Storage.Queue.Tests.csproj", "{2883098E-DE57-4EFF-9BFA-78DB42A86CDF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BackgroundProcessing.Azure.Storage.Queue.Tests", "BackgroundProcessing.Azure.Storage.Queue.Tests\BackgroundProcessing.Azure.Storage.Queue.Tests.csproj", "{2883098E-DE57-4EFF-9BFA-78DB42A86CDF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BackgroundProcessing.Azure.ApplicationInsights", "BackgroundProcessing.Azure.ApplicationInsights\BackgroundProcessing.Azure.ApplicationInsights.csproj", "{15BB7B67-C6BE-4CAE-AA9A-1AE2FF0C485F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -46,6 +48,10 @@ Global
 		{2883098E-DE57-4EFF-9BFA-78DB42A86CDF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2883098E-DE57-4EFF-9BFA-78DB42A86CDF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2883098E-DE57-4EFF-9BFA-78DB42A86CDF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{15BB7B67-C6BE-4CAE-AA9A-1AE2FF0C485F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{15BB7B67-C6BE-4CAE-AA9A-1AE2FF0C485F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{15BB7B67-C6BE-4CAE-AA9A-1AE2FF0C485F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{15BB7B67-C6BE-4CAE-AA9A-1AE2FF0C485F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
