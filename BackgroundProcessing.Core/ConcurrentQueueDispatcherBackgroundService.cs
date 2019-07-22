@@ -80,7 +80,6 @@ namespace BackgroundProcessing.Core
                     catch (Exception ex)
                     {
                         _logger.LogError($"An error occured while processing {command}: {ex.Message}", ex);
-                        await options.ErrorHandler?.Invoke(command, ex, stoppingToken);
                     }
                 },
                 new ExecutionDataflowBlockOptions

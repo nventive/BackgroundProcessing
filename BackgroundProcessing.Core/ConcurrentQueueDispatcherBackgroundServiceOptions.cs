@@ -14,10 +14,5 @@ namespace BackgroundProcessing.Core
         /// Defaults to the CPU count.
         /// </summary>
         public int DegreeOfParallelism { get; set; } = Environment.ProcessorCount;
-
-        /// <summary>
-        /// Gets or sets a handler that will be notified when an error occurs.
-        /// </summary>
-        public Func<IBackgroundCommand, Exception, CancellationToken, Task> ErrorHandler { get; set; }
     }
 }

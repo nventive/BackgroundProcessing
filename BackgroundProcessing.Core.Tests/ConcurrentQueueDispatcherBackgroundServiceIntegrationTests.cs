@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -56,43 +55,6 @@ namespace BackgroundProcessing.Core.Tests
             }
         }
 
-        [Fact]
-        public async Task ItShouldInvokeErrorHandler()
-        {
-            var command = new HostingServiceIntegrationTestsErrorCommand();
-            IBackgroundCommand caughtCommand = null;
-            Exception caughtException = null;
-
-            using (var countDownEvent = new CountdownEvent(1))
-            using (var host = new HostBuilder()
-                .ConfigureServices(services =>
-                {
-                    services
-                        .AddSingleton(sp => _output)
-                        .AddSingleton<ILogger<ConcurrentQueueDispatcherBackgroundService>>(_ => new XunitLogger<ConcurrentQueueDispatcherBackgroundService>(_output));
-                    services
-                        .AddBackgroundCommandHandlersFromAssemblyContaining<ConcurrentQueueDispatcherBackgroundServiceIntegrationTests>()
-                        .AddHostingServiceConcurrentQueueBackgroundProcessing(options =>
-                        {
-                            options.ErrorHandler = async (cmd, ex, ct) =>
-                            {
-                                caughtCommand = cmd;
-                                caughtException = ex;
-                                countDownEvent.Signal();
-                            };
-                        });
-                })
-                .Start())
-            {
-                var dispatcher = host.Services.GetRequiredService<IBackgroundDispatcher>();
-                await dispatcher.DispatchAsync(command);
-                countDownEvent.Wait(TimeSpan.FromSeconds(30));
-
-                caughtCommand.Should().Be(command);
-                caughtException.Message.Should().Be(command.Id);
-            }
-        }
-
         private class HostingServiceIntegrationTestsCommand : BackgroundCommand
         {
         }
@@ -112,26 +74,6 @@ namespace BackgroundProcessing.Core.Tests
                 _output.WriteLine($"Processing {command}");
                 Commands.Add(command);
                 _output.WriteLine($"Processed {command}");
-            }
-        }
-
-        private class HostingServiceIntegrationTestsErrorCommand : BackgroundCommand
-        {
-        }
-
-        private class HostingServiceIntegrationTestsErrorCommandHandler : IBackgroundCommandHandler<HostingServiceIntegrationTestsErrorCommand>
-        {
-            private readonly ITestOutputHelper _output;
-
-            public HostingServiceIntegrationTestsErrorCommandHandler(ITestOutputHelper output)
-            {
-                _output = output ?? throw new ArgumentNullException(nameof(output));
-            }
-
-            public async Task HandleAsync(HostingServiceIntegrationTestsErrorCommand command, CancellationToken cancellationToken = default)
-            {
-                _output.WriteLine($"Throw exception: {command}");
-                throw new Exception(command.Id);
             }
         }
     }

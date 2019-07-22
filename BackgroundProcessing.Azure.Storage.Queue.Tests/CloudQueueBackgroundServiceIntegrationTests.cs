@@ -54,49 +54,6 @@ namespace BackgroundProcessing.Azure.Storage.Queue.Tests
             }
         }
 
-        [Fact]
-        public async Task ItShouldInvokeErrorHandler()
-        {
-            var command = new CloudQueueIntegrationTestsErrorCommand();
-            IBackgroundCommand caughtCommand = null;
-            Exception caughtException = null;
-
-            using (var countDownEvent = new CountdownEvent(1))
-            using (var host = new HostBuilder()
-                .ConfigureAppConfiguration((ctx, config) =>
-                {
-                    config
-                        .AddJsonFile("appsettings.json", true)
-                        .AddEnvironmentVariables();
-                })
-                .ConfigureServices(services =>
-                {
-                    services
-                        .AddBackgroundCommandHandlersFromAssemblyContaining<CloudQueueBackgroundServiceIntegrationTests>()
-                        .AddAzureStorageQueueBackgroundDispatcher()
-                        .Services
-                        .AddAzureStorageQueueBackgroundProcessing(options =>
-                        {
-                            options.ErrorHandler = async (cmd, ex, ct) =>
-                            {
-                                caughtCommand = cmd;
-                                caughtException = ex;
-                                countDownEvent.Signal();
-                            };
-                        })
-                        .ConfigureCloudQueueUsingConnectionStringName("StorageQueue", "bgtasks-integrationtests");
-                })
-                .Start())
-            {
-                var dispatcher = host.Services.GetRequiredService<IBackgroundDispatcher>();
-                await dispatcher.DispatchAsync(command);
-                countDownEvent.Wait(TimeSpan.FromSeconds(30));
-
-                caughtCommand.Should().BeEquivalentTo(command);
-                caughtException.Message.Should().Be(command.Id);
-            }
-        }
-
         private class CloudQueueIntegrationTestsCommand : BackgroundCommand
         {
         }
@@ -108,18 +65,6 @@ namespace BackgroundProcessing.Azure.Storage.Queue.Tests
             public async Task HandleAsync(CloudQueueIntegrationTestsCommand command, CancellationToken cancellationToken = default)
             {
                 Commands.Add(command);
-            }
-        }
-
-        private class CloudQueueIntegrationTestsErrorCommand : BackgroundCommand
-        {
-        }
-
-        private class CloudQueueIntegrationTestsErrorCommandHandler : IBackgroundCommandHandler<CloudQueueIntegrationTestsErrorCommand>
-        {
-            public async Task HandleAsync(CloudQueueIntegrationTestsErrorCommand command, CancellationToken cancellationToken = default)
-            {
-                throw new Exception(command.Id);
             }
         }
     }

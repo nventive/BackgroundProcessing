@@ -74,10 +74,5 @@ namespace BackgroundProcessing.Azure.Storage.Queue
         /// Gets or sets the <see cref="OperationContext"/>.
         /// </summary>
         public Func<OperationContext> OperationContextBuilder { get; set; }
-
-        /// <summary>
-        /// Gets or sets a handler that will be notified when an error occurs.
-        /// </summary>
-        public Func<IBackgroundCommand, Exception, CancellationToken, Task> ErrorHandler { get; set; }
     }
 }

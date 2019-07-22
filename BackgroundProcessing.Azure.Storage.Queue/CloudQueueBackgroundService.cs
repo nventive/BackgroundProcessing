@@ -66,14 +66,12 @@ namespace BackgroundProcessing.Azure.Storage.Queue
                         {
                             var processor = scope.ServiceProvider.GetRequiredService<IBackgroundProcessor>();
                             await processor.ProcessAsync(command, combinedCancellationTokenSource.Token);
-                            combinedCancellationTokenSource.Token.ThrowIfCancellationRequested();
                             await _queue.DeleteMessageAsync(message);
                         }
                     }
                     catch (Exception ex)
                     {
                         _logger.LogError($"An error occured while processing {command}: {ex.Message}", ex);
-                        await options.ErrorHandler?.Invoke(command, ex, stoppingToken);
                     }
                 },
                 new ExecutionDataflowBlockOptions
