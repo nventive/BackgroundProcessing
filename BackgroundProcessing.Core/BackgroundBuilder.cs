@@ -35,6 +35,18 @@ namespace Microsoft.Extensions.DependencyInjection
         }
 
         /// <summary>
+        /// Decorate the currently registered <see cref="IBackgroundDispatcher"/> if it exists, otherwise do nothing.
+        /// </summary>
+        /// <typeparam name="TDecorator">The decorator type.</typeparam>
+        /// <returns>The configured <see cref="BackgroundBuilder"/>.</returns>
+        public BackgroundBuilder TryDecorateDispatcher<TDecorator>()
+            where TDecorator : IBackgroundDispatcher
+        {
+            Services.TryDecorate<IBackgroundDispatcher, TDecorator>();
+            return this;
+        }
+
+        /// <summary>
         /// Decorate the currently registered <see cref="IBackgroundProcessor"/>.
         /// </summary>
         /// <typeparam name="TDecorator">The decorator type.</typeparam>
@@ -43,6 +55,18 @@ namespace Microsoft.Extensions.DependencyInjection
             where TDecorator : IBackgroundProcessor
         {
             Services.Decorate<IBackgroundProcessor, TDecorator>();
+            return this;
+        }
+
+        /// <summary>
+        /// Decorate the currently registered <see cref="IBackgroundProcessor"/> if it exists, otherwise do nothing.
+        /// </summary>
+        /// <typeparam name="TDecorator">The decorator type.</typeparam>
+        /// <returns>The configured <see cref="BackgroundBuilder"/>.</returns>
+        public BackgroundBuilder TryDecorateProcessor<TDecorator>()
+            where TDecorator : IBackgroundProcessor
+        {
+            Services.TryDecorate<IBackgroundProcessor, TDecorator>();
             return this;
         }
     }

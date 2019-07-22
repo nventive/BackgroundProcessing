@@ -19,8 +19,8 @@ namespace Microsoft.Extensions.DependencyInjection
                 throw new System.ArgumentNullException(nameof(builder));
             }
 
-            builder.DecorateDispatcher<TelemetryClientDispatcherDecorator>();
-            builder.DecorateProcessor<TelemetryClientProcessorDecorator>();
+            builder.TryDecorateDispatcher<TelemetryClientDispatcherDecorator>();
+            builder.TryDecorateProcessor<TelemetryClientProcessorDecorator>();
             return builder;
         }
     }
