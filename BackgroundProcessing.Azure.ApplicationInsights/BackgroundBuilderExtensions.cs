@@ -1,4 +1,5 @@
-﻿using BackgroundProcessing.Azure.ApplicationInsights;
+﻿using System;
+using BackgroundProcessing.Azure.ApplicationInsights;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
@@ -11,12 +12,18 @@ namespace Microsoft.Extensions.DependencyInjection
         /// Adds Application Insights monitoring to background processing.
         /// </summary>
         /// <param name="builder">The <see cref="BackgroundBuilder"/>.</param>
+        /// <param name="configureOptions">Configure the <see cref="TelemetryClientDecoratorOptions"/> if needed.</param>
         /// <returns>The configured <see cref="BackgroundBuilder"/>.</returns>
-        public static BackgroundBuilder AddApplicationInsightsDecorators(this BackgroundBuilder builder)
+        public static BackgroundBuilder AddApplicationInsightsDecorators(this BackgroundBuilder builder, Action<TelemetryClientDecoratorOptions> configureOptions)
         {
             if (builder == null)
             {
                 throw new System.ArgumentNullException(nameof(builder));
+            }
+
+            if (configureOptions != null)
+            {
+                builder.Services.Configure(configureOptions);
             }
 
             builder.TryDecorateDispatcher<TelemetryClientDispatcherDecorator>();
