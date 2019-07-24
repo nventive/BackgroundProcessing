@@ -8,6 +8,8 @@ Support for in-memory queue and Azure Storage Queue.
 Integrated with .NET Core Dependency Injection.
 
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
+[![Build Status](https://dev.azure.com/nventive-public/nventive/_apis/build/status/nventive.BackgroundProcessing?branchName=master)](https://dev.azure.com/nventive-public/nventive/_build/latest?definitionId=7&branchName=master)
+![Nuget](https://img.shields.io/nuget/v/BackgroundProcessing.Core.svg)
 
 ## Getting Started
 
