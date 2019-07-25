@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -6,29 +7,44 @@ using BackgroundProcessing.Core;
 using BackgroundProcessing.Core.Events;
 using BackgroundProcessing.Core.Testing;
 using FluentAssertions;
+using Microsoft.Azure.Cosmos;
+using Microsoft.Azure.Cosmos.Table;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Xunit;
 
-namespace BackgroundProcessing.Caching.Tests
+namespace BackgroundProcessing.Azure.Storage.Queue.Tests
 {
-    public class DistributedCacheBackgroundCommandEventRepositoryIntegrationTests
+    public class CloudTableBackgroundCommandEventRepositoryIntegrationTests
     {
         [Fact]
         public async Task ItShouldProcessBackgroundCommands()
         {
-            var commands = new[] { new DistributedCacheBackgroundCommandEventRepositoryIntegrationTestsCommand() }; // new DistributedCacheBackgroundCommandEventRepositoryIntegrationTestsCommand() };
+            var commands = new[] { new CloudTableBackgroundCommandEventRepositoryIntegrationTestsCommand(), new CloudTableBackgroundCommandEventRepositoryIntegrationTestsCommand() };
 
             using (var host = new HostBuilder()
+                .ConfigureAppConfiguration((ctx, config) =>
+                {
+                    config
+                        .AddJsonFile("appsettings.json", true)
+                        .AddEnvironmentVariables();
+                })
                 .ConfigureServices(services =>
                 {
+                    var configuration = services.BuildServiceProvider().GetRequiredService<IConfiguration>();
+                    var connectionString = configuration.GetConnectionString("StorageTable");
+                    var storageAccount = CloudStorageAccount.Parse(connectionString);
+                    var tableClient = storageAccount.CreateCloudTableClient();
+                    var cloudTable = tableClient.GetTableReference("bgtasksintegrationtests");
+                    cloudTable.CreateIfNotExists();
+
                     services
-                        .AddDistributedMemoryCache()
-                        .AddBackgroundCommandHandlersFromAssemblyContaining<MemoryCacheBackgroundCommandEventRepositoryIntegrationTests>()
+                        .AddBackgroundCommandHandlersFromAssemblyContaining<CloudTableBackgroundCommandEventRepositoryIntegrationTests>()
                         .AddHostingServiceConcurrentQueueBackgroundProcessing()
                         .AddBackgroundCommandEventsRepositoryDecorators()
                         .AddCountdownEventBackgroundProcessorDecorator(commands.Count())
-                        .AddDistributedCacheEventRepository();
+                        .AddCloudTableEventRepository(cloudTable);
                 })
                 .Start())
             {
@@ -54,13 +70,13 @@ namespace BackgroundProcessing.Caching.Tests
             }
         }
 
-        private class DistributedCacheBackgroundCommandEventRepositoryIntegrationTestsCommand : BackgroundCommand
+        private class CloudTableBackgroundCommandEventRepositoryIntegrationTestsCommand : BackgroundCommand
         {
         }
 
-        private class DistributedCacheBackgroundCommandEventRepositoryIntegrationTestsCommandHandler : IBackgroundCommandHandler<DistributedCacheBackgroundCommandEventRepositoryIntegrationTestsCommand>
+        private class CloudTableBackgroundCommandEventRepositoryIntegrationTestsCommandHandler : IBackgroundCommandHandler<CloudTableBackgroundCommandEventRepositoryIntegrationTestsCommand>
         {
-            public async Task HandleAsync(DistributedCacheBackgroundCommandEventRepositoryIntegrationTestsCommand command, CancellationToken cancellationToken = default)
+            public async Task HandleAsync(CloudTableBackgroundCommandEventRepositoryIntegrationTestsCommand command, CancellationToken cancellationToken = default)
             {
             }
         }

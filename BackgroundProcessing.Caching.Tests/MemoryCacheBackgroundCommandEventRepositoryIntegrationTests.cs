@@ -47,6 +47,10 @@ namespace BackgroundProcessing.Caching.Tests
                 allEvents.Should().NotBeEmpty();
                 allEvents.Should().HaveCount(3);
                 allEvents.Should().OnlyContain(x => x.Command == commands[0]);
+
+                var latestEvent = await repository.GetLatestEventForCommandId(commands[0].Id);
+                latestEvent.Command.Id.Should().Be(commands[0].Id);
+                latestEvent.Status.Should().Be(BackgroundCommandEventStatus.Processed);
             }
         }
 

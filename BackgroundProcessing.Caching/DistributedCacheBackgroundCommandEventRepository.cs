@@ -26,14 +26,14 @@ namespace BackgroundProcessing.Caching
         /// </summary>
         /// <param name="cache">The <see cref="IDistributedCache"/>.</param>
         /// <param name="expiration">The duration of items in the cache before expiring.</param>
-        /// <param name="serializer">The <see cref="IBackgroundCommandEventsSerializer"/>. Default to <see cref="JsonNetBackgroundCommandEventSerializer"/>.</param>
+        /// <param name="serializer">The <see cref="IBackgroundCommandEventsSerializer"/>.</param>
         public DistributedCacheBackgroundCommandEventRepository(
             IDistributedCache cache,
             TimeSpan expiration,
-            IBackgroundCommandEventsSerializer serializer = null)
+            IBackgroundCommandEventsSerializer serializer)
         {
             _cache = cache ?? throw new ArgumentNullException(nameof(cache));
-            _serializer = serializer ?? new JsonNetBackgroundCommandEventSerializer();
+            _serializer = serializer ?? throw new ArgumentNullException(nameof(serializer));
             _distributedCacheEntryOptions = new DistributedCacheEntryOptions { SlidingExpiration = expiration };
         }
 
@@ -64,7 +64,7 @@ namespace BackgroundProcessing.Caching
                 return null;
             }
 
-            return allEvents.OrderByDescending(x => x.Timestamp).LastOrDefault();
+            return allEvents.OrderByDescending(x => x.Timestamp).FirstOrDefault();
         }
 
         /// <inheritdoc />

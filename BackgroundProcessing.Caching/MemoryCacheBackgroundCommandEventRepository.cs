@@ -60,7 +60,7 @@ namespace BackgroundProcessing.Caching
                 return null;
             }
 
-            return allEvents.OrderByDescending(x => x.Timestamp).LastOrDefault();
+            return allEvents.OrderByDescending(x => x.Timestamp).FirstOrDefault();
         }
 
         /// <inheritdoc />

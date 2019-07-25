@@ -3,6 +3,7 @@ using BackgroundProcessing.Caching;
 using BackgroundProcessing.Core.Events;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
@@ -45,6 +46,8 @@ namespace Microsoft.Extensions.DependencyInjection
             {
                 throw new ArgumentNullException(nameof(builder));
             }
+
+            builder.Services.TryAddSingleton<IBackgroundCommandEventsSerializer>(sp => new JsonNetBackgroundCommandEventSerializer());
 
             builder.Services.AddSingleton<IBackgroundCommandEventRepository>(
                 sp => new DistributedCacheBackgroundCommandEventRepository(
