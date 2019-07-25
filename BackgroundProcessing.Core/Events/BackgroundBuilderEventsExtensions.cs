@@ -1,5 +1,4 @@
-﻿using BackgroundProcessing.Core;
-using BackgroundProcessing.Core.Events;
+﻿using BackgroundProcessing.Core.Events;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
