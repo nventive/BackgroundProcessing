@@ -6,7 +6,6 @@ using BackgroundProcessing.Core;
 using BackgroundProcessing.Core.Events;
 using BackgroundProcessing.Core.Testing;
 using FluentAssertions;
-using Microsoft.Azure.Cosmos.Table;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -19,7 +18,7 @@ namespace BackgroundProcessing.Azure.Storage.Queue.Tests
         [Fact]
         public async Task ItShouldProcessBackgroundCommands()
         {
-            var commands = new[] { new CloudTableBackgroundCommandEventRepositoryIntegrationTestsCommand() }; //, new CloudTableBackgroundCommandEventRepositoryIntegrationTestsCommand() };
+            var commands = new[] { new CloudTableBackgroundCommandEventRepositoryIntegrationTestsCommand(), new CloudTableBackgroundCommandEventRepositoryIntegrationTestsCommand() };
 
             using (var host = new HostBuilder()
                 .ConfigureAppConfiguration((ctx, config) =>
@@ -31,22 +30,11 @@ namespace BackgroundProcessing.Azure.Storage.Queue.Tests
                 .ConfigureServices(services =>
                 {
                     services
-                        .AddSingleton(sp =>
-                        {
-                            var configuration = services.BuildServiceProvider().GetRequiredService<IConfiguration>();
-                            var connectionString = configuration.GetConnectionString("StorageTable");
-                            var storageAccount = CloudStorageAccount.Parse(connectionString);
-                            var tableClient = storageAccount.CreateCloudTableClient();
-                            var cloudTable = tableClient.GetTableReference("bgtasksintegrationtests");
-                            cloudTable.CreateIfNotExists();
-
-                            return cloudTable;
-                        })
                         .AddBackgroundCommandHandlersFromAssemblyContaining<CloudTableBackgroundCommandEventRepositoryIntegrationTests>()
                         .AddHostingServiceConcurrentQueueBackgroundProcessing()
                         .AddBackgroundCommandEventsRepositoryDecorators()
                         .AddCountdownEventBackgroundProcessorDecorator(commands.Count())
-                        .AddCloudTableEventRepository();
+                        .AddCloudTableEventRepository(CloudTableProvider.FromConnectionStringName("StorageTable", "bgtasksintegrationtests"));
                 })
                 .Start())
             {

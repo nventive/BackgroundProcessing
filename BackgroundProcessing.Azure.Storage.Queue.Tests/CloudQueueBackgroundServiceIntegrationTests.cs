@@ -30,12 +30,12 @@ namespace BackgroundProcessing.Azure.Storage.Queue.Tests
                 })
                 .ConfigureServices(services =>
                 {
+                    var cloudQueueProvider = CloudQueueProvider.FromConnectionStringName("StorageQueue", "bgtasks-integrationtests");
                     services
                         .AddBackgroundCommandHandlersFromAssemblyContaining<CloudQueueBackgroundServiceIntegrationTests>()
-                        .AddAzureStorageQueueBackgroundDispatcher()
+                        .AddAzureStorageQueueBackgroundDispatcher(cloudQueueProvider)
                         .Services
-                        .AddAzureStorageQueueBackgroundProcessing()
-                        .ConfigureCloudQueueUsingConnectionStringName("StorageQueue", "bgtasks-integrationtests")
+                        .AddAzureStorageQueueBackgroundProcessing(cloudQueueProvider)
                         .AddCountdownEventBackgroundProcessorDecorator(commands.Count());
                 })
                 .Start())

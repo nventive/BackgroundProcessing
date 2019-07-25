@@ -20,26 +20,27 @@ namespace Microsoft.Extensions.DependencyInjection
         /// You must register a service for <see cref="CloudQueue"/> to use this method.
         /// </summary>
         /// <param name="services">The <see cref="IServiceCollection"/> to configure.</param>
-        /// <param name="cloudQueueProvider">The <see cref="CloudQueue"/> provider to use. Will take it from Dependency injection if not provided.</param>
+        /// <param name="cloudQueueProvider">The <see cref="CloudQueue"/> provider to use.</param>
         /// <param name="configureOptions">To configure the <see cref="CloudQueueBackgroundDispatcherOptions"/> by code.</param>
         /// <returns>The configured <see cref="IServiceCollection"/>.</returns>
         public static BackgroundBuilder AddAzureStorageQueueBackgroundDispatcher(
             this IServiceCollection services,
-            Func<IServiceProvider, CloudQueue> cloudQueueProvider = null,
+            Func<IServiceProvider, CloudQueue> cloudQueueProvider,
             Action<CloudQueueBackgroundDispatcherOptions> configureOptions = null)
         {
+            if (cloudQueueProvider is null)
+            {
+                throw new ArgumentNullException(nameof(cloudQueueProvider));
+            }
+
             if (configureOptions != null)
             {
                 services.Configure(configureOptions);
             }
 
             services.TryAddSingleton<IBackgroundCommandSerializer, JsonNetBackgroundCommandSerializer>();
-            if (cloudQueueProvider == null)
-            {
-                cloudQueueProvider = (sp) => sp.GetRequiredService<CloudQueue>();
-            }
 
-            services.AddScoped<IBackgroundDispatcher>(
+            services.AddSingleton<IBackgroundDispatcher>(
                 sp => new CloudQueueBackgroundDispatcher(
                     sp.GetRequiredService<IOptions<CloudQueueBackgroundDispatcherOptions>>(),
                     cloudQueueProvider(sp),
@@ -52,22 +53,22 @@ namespace Microsoft.Extensions.DependencyInjection
         /// Setup local processing of <see cref="IBackgroundCommand"/> using Azure Storage Queue and a <see cref="BackgroundService"/>.
         /// </summary>
         /// <param name="services">The <see cref="IServiceCollection"/> to configure.</param>
-        /// <param name="cloudQueueProvider">The <see cref="CloudQueue"/> provider to use. Will take it from Dependency injection if not provided.</param>
+        /// <param name="cloudQueueProvider">The <see cref="CloudQueue"/> provider to use.</param>
         /// <param name="configureOptions">To configure the <see cref="CloudQueueBackgroundServiceOptions"/> by code.</param>
         /// <returns>The configured <see cref="IServiceCollection"/>.</returns>
         public static BackgroundBuilder AddAzureStorageQueueBackgroundProcessing(
             this IServiceCollection services,
-            Func<IServiceProvider, CloudQueue> cloudQueueProvider = null,
+            Func<IServiceProvider, CloudQueue> cloudQueueProvider,
             Action<CloudQueueBackgroundServiceOptions> configureOptions = null)
         {
+            if (cloudQueueProvider is null)
+            {
+                throw new ArgumentNullException(nameof(cloudQueueProvider));
+            }
+
             if (configureOptions != null)
             {
                 services.Configure(configureOptions);
-            }
-
-            if (cloudQueueProvider == null)
-            {
-                cloudQueueProvider = (sp) => sp.GetRequiredService<CloudQueue>();
             }
 
             services.TryAddSingleton<IBackgroundCommandSerializer, JsonNetBackgroundCommandSerializer>();
@@ -80,8 +81,6 @@ namespace Microsoft.Extensions.DependencyInjection
                     sp.GetRequiredService<IBackgroundCommandSerializer>(),
                     sp,
                     sp.GetRequiredService<ILogger<CloudQueueBackgroundService>>()));
-
-            services.AddHostedService<CloudQueueBackgroundService>();
 
             return new BackgroundBuilder(services);
         }
