@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -7,7 +6,6 @@ using BackgroundProcessing.Core;
 using BackgroundProcessing.Core.Events;
 using BackgroundProcessing.Core.Testing;
 using FluentAssertions;
-using Microsoft.Azure.Cosmos;
 using Microsoft.Azure.Cosmos.Table;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -21,7 +19,7 @@ namespace BackgroundProcessing.Azure.Storage.Queue.Tests
         [Fact]
         public async Task ItShouldProcessBackgroundCommands()
         {
-            var commands = new[] { new CloudTableBackgroundCommandEventRepositoryIntegrationTestsCommand(), new CloudTableBackgroundCommandEventRepositoryIntegrationTestsCommand() };
+            var commands = new[] { new CloudTableBackgroundCommandEventRepositoryIntegrationTestsCommand() }; //, new CloudTableBackgroundCommandEventRepositoryIntegrationTestsCommand() };
 
             using (var host = new HostBuilder()
                 .ConfigureAppConfiguration((ctx, config) =>

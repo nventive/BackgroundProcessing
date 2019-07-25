@@ -48,21 +48,18 @@ namespace BackgroundProcessing.Azure.Storage.Table
         public async Task<IEnumerable<BackgroundCommandEvent>> GetAllEventsForCommandId(string commandId, CancellationToken cancellationToken = default)
         {
             var query = new TableQuery<EventTableEntity>()
-                .Where(TableQuery.GenerateFilterCondition(nameof(EventTableEntity.PartitionKey), QueryComparisons.Equal, commandId))
-                .OrderByDesc(nameof(EventTableEntity.EventTimestamp));
-            return _cloudTable.ExecuteQuery(query).Select(x => x.ToBackgroundCommandEvent(_commandSerializer));
+                .Where(TableQuery.GenerateFilterCondition(nameof(EventTableEntity.PartitionKey), QueryComparisons.Equal, commandId));
+            return _cloudTable
+                .ExecuteQuery(query)
+                .Select(x => x.ToBackgroundCommandEvent(_commandSerializer))
+                .OrderByDescending(x => x.Timestamp)
+                .ThenByDescending(x => x.Status)
+                .ToList();
         }
 
         /// <inheritdoc />
         public async Task<BackgroundCommandEvent> GetLatestEventForCommandId(string commandId, CancellationToken cancellationToken = default)
-        {
-            var query = new TableQuery<EventTableEntity>()
-                .Where(TableQuery.GenerateFilterCondition(nameof(EventTableEntity.PartitionKey), QueryComparisons.Equal, commandId))
-                .OrderByDesc(nameof(EventTableEntity.EventTimestamp))
-                .Take(1);
-
-            return _cloudTable.ExecuteQuery(query).Select(x => x.ToBackgroundCommandEvent(_commandSerializer)).FirstOrDefault();
-        }
+            => (await GetAllEventsForCommandId(commandId, cancellationToken)).FirstOrDefault();
 
         private class EventTableEntity : TableEntity
         {

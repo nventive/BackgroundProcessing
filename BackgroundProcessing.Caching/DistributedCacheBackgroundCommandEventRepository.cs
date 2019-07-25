@@ -64,7 +64,7 @@ namespace BackgroundProcessing.Caching
                 return null;
             }
 
-            return allEvents.OrderByDescending(x => x.Timestamp).FirstOrDefault();
+            return allEvents.OrderByDescending(x => x.Timestamp).ThenByDescending(x => x.Status).FirstOrDefault();
         }
 
         /// <inheritdoc />
@@ -81,7 +81,7 @@ namespace BackgroundProcessing.Caching
                 return Enumerable.Empty<BackgroundCommandEvent>();
             }
 
-            return allEvents.OrderByDescending(x => x.Timestamp).ToList();
+            return allEvents.OrderByDescending(x => x.Timestamp).ThenByDescending(x => x.Status).ToList();
         }
 
         private async Task<IList<BackgroundCommandEvent>> GetFromCache(string commandId, CancellationToken cancellationToken)
