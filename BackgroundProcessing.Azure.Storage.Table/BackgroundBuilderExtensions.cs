@@ -17,19 +17,26 @@ namespace Microsoft.Extensions.DependencyInjection
         /// Adds <see cref="CloudTableBackgroundCommandEventRepository"/> to store events using <see cref="CloudTable"/>.
         /// </summary>
         /// <param name="builder">The <see cref="BackgroundBuilder"/>.</param>
-        /// <param name="cloudTable">The <see cref="CloudTable"/> instance to use.</param>
+        /// <param name="cloudTableProvider">The <see cref="CloudTable"/> provider. Defaults to Dependency Injection if not provided.</param>
         /// <returns>The configured <see cref="BackgroundBuilder"/>.</returns>
-        public static BackgroundBuilder AddCloudTableEventRepository(this BackgroundBuilder builder, CloudTable cloudTable)
+        public static BackgroundBuilder AddCloudTableEventRepository(
+            this BackgroundBuilder builder,
+            Func<IServiceProvider, CloudTable> cloudTableProvider = null)
         {
             if (builder == null)
             {
                 throw new ArgumentNullException(nameof(builder));
             }
 
+            if (cloudTableProvider == null)
+            {
+                cloudTableProvider = (sp) => sp.GetRequiredService<CloudTable>();
+            }
+
             builder.Services.TryAddSingleton<IBackgroundCommandSerializer, JsonNetBackgroundCommandSerializer>();
             builder.Services.AddSingleton<IBackgroundCommandEventRepository>(
                 sp => new CloudTableBackgroundCommandEventRepository(
-                    cloudTable,
+                    cloudTableProvider(sp),
                     sp.GetRequiredService<IBackgroundCommandSerializer>()));
             return builder;
         }

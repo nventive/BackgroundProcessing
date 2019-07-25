@@ -32,19 +32,23 @@ namespace BackgroundProcessing.Azure.Storage.Queue.Tests
                 })
                 .ConfigureServices(services =>
                 {
-                    var configuration = services.BuildServiceProvider().GetRequiredService<IConfiguration>();
-                    var connectionString = configuration.GetConnectionString("StorageTable");
-                    var storageAccount = CloudStorageAccount.Parse(connectionString);
-                    var tableClient = storageAccount.CreateCloudTableClient();
-                    var cloudTable = tableClient.GetTableReference("bgtasksintegrationtests");
-                    cloudTable.CreateIfNotExists();
-
                     services
+                        .AddSingleton(sp =>
+                        {
+                            var configuration = services.BuildServiceProvider().GetRequiredService<IConfiguration>();
+                            var connectionString = configuration.GetConnectionString("StorageTable");
+                            var storageAccount = CloudStorageAccount.Parse(connectionString);
+                            var tableClient = storageAccount.CreateCloudTableClient();
+                            var cloudTable = tableClient.GetTableReference("bgtasksintegrationtests");
+                            cloudTable.CreateIfNotExists();
+
+                            return cloudTable;
+                        })
                         .AddBackgroundCommandHandlersFromAssemblyContaining<CloudTableBackgroundCommandEventRepositoryIntegrationTests>()
                         .AddHostingServiceConcurrentQueueBackgroundProcessing()
                         .AddBackgroundCommandEventsRepositoryDecorators()
                         .AddCountdownEventBackgroundProcessorDecorator(commands.Count())
-                        .AddCloudTableEventRepository(cloudTable);
+                        .AddCloudTableEventRepository();
                 })
                 .Start())
             {
