@@ -127,14 +127,11 @@ And register the services:
 using Microsoft.Extensions.DependencyInjection;
 
 // in your Startup.cs, or wherever services are registered.
-services.AddAzureStorageQueueBackgroundDispatcher();
-services
-  .AddAzureStorageQueueBackgroundProcessing()
-  // Convenient method to register the CloudQueue client from a connection string.
-  .ConfigureCloudQueueUsingConnectionStringName("ConnectionStringName", "queue name");
 
-// Alternatively, you can build a CloudQueue service and register it yourself
-services.AddSingleton<CloudQueue>(serviceProvider => { ... });
+// Convenient method to create cloud queues.
+var cloudQueueProvider = CloudQueueProvider.FromConnectionStringName("ConnectionStringName", "queue name");
+services.AddAzureStorageQueueBackgroundDispatcher(cloudQueueProvider);
+services.AddAzureStorageQueueBackgroundProcessing(cloudQueueProvider);
 ```
 
 ### Getting started using Azure Functions processing and Azure Storage Queue
@@ -274,6 +271,32 @@ using Microsoft.Extensions.DependencyInjection;
 services
     .Add...Processing() // or Add...Dispatcher()
     .AddApplicationInsightsDecorators();
+```
+
+### Get and store execution events
+
+It is possible to store the history of execution events related to commands.
+The component provides a `IBackgroundCommandEventRepository` interface to allow
+storage and retrieval of events related to commands.
+
+### Store events in the ASP.NET Core cache.
+
+Install-Package
+
+### Store events in an Azure Table Storage
+
+Install-Package
+
+### Query events
+
+To query events, just require and use the `IBackgroundCommandEventRepository` interface.
+
+Example of such usage in a ASP.NET Core Controller with a polling REST API:
+
+```csharp
+
+
+
 ```
 
 ### Further customizations

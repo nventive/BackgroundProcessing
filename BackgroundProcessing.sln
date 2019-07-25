@@ -34,6 +34,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BackgroundProcessing.Azure.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BackgroundProcessing.Azure.Storage.Table.Tests", "BackgroundProcessing.Azure.Storage.Table.Tests\BackgroundProcessing.Azure.Storage.Table.Tests.csproj", "{B5292097-25FD-43DC-8897-3D1860928640}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BackgroundProcessing.WebSample", "BackgroundProcessing.WebSample\BackgroundProcessing.WebSample.csproj", "{BD2267F2-A286-4CA9-8CA8-7BA317F5D119}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -76,6 +78,10 @@ Global
 		{B5292097-25FD-43DC-8897-3D1860928640}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B5292097-25FD-43DC-8897-3D1860928640}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B5292097-25FD-43DC-8897-3D1860928640}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BD2267F2-A286-4CA9-8CA8-7BA317F5D119}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BD2267F2-A286-4CA9-8CA8-7BA317F5D119}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BD2267F2-A286-4CA9-8CA8-7BA317F5D119}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BD2267F2-A286-4CA9-8CA8-7BA317F5D119}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
