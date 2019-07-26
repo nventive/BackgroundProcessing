@@ -10,7 +10,7 @@ namespace Microsoft.Extensions.DependencyInjection
     public static class CloudTableProvider
     {
         /// <summary>
-        /// Returns a <see cref="CloudTable"/> provider initialized from a connection string name and a table name.
+        /// Returns a memoized <see cref="CloudTable"/> provider initialized from a connection string name and a table name.
         /// Will create the table if it does not exists.
         /// </summary>
         /// <param name="connectionStringName">The name of the connection string.</param>
@@ -20,21 +20,34 @@ namespace Microsoft.Extensions.DependencyInjection
             string connectionStringName,
             string tableName)
         {
+            CloudTable memoizedTable = null;
+            var objectLock = new object();
+
             return (sp) =>
             {
-                var configuration = sp.GetRequiredService<IConfiguration>();
-                var connectionString = configuration.GetConnectionString(connectionStringName);
-                var storageAccount = CloudStorageAccount.Parse(connectionString);
-                var tableClient = storageAccount.CreateCloudTableClient();
-                var cloudTable = tableClient.GetTableReference(tableName);
-                cloudTable.CreateIfNotExists();
+                if (memoizedTable is null)
+                {
+                    lock (objectLock)
+                    {
+                        if (memoizedTable is null)
+                        {
+                            var configuration = sp.GetRequiredService<IConfiguration>();
+                            var connectionString = configuration.GetConnectionString(connectionStringName);
+                            var storageAccount = CloudStorageAccount.Parse(connectionString);
+                            var tableClient = storageAccount.CreateCloudTableClient();
+                            var cloudTable = tableClient.GetTableReference(tableName);
+                            cloudTable.CreateIfNotExists();
+                            memoizedTable = cloudTable;
+                        }
+                    }
+                }
 
-                return cloudTable;
+                return memoizedTable;
             };
         }
 
         /// <summary>
-        /// Returns a <see cref="CloudTable"/> provider initialized from a connection string and a table name.
+        /// Returns a memoized <see cref="CloudTable"/> provider initialized from a connection string and a table name.
         /// Will create the table if it does not exists.
         /// </summary>
         /// <param name="connectionString">The connection string.</param>
@@ -44,14 +57,27 @@ namespace Microsoft.Extensions.DependencyInjection
             string connectionString,
             string tableName)
         {
+            CloudTable memoizedTable = null;
+            var objectLock = new object();
+
             return (sp) =>
             {
-                var storageAccount = CloudStorageAccount.Parse(connectionString);
-                var tableClient = storageAccount.CreateCloudTableClient();
-                var cloudTable = tableClient.GetTableReference(tableName);
-                cloudTable.CreateIfNotExists();
+                if (memoizedTable is null)
+                {
+                    lock (objectLock)
+                    {
+                        if (memoizedTable is null)
+                        {
+                            var storageAccount = CloudStorageAccount.Parse(connectionString);
+                            var tableClient = storageAccount.CreateCloudTableClient();
+                            var cloudTable = tableClient.GetTableReference(tableName);
+                            cloudTable.CreateIfNotExists();
+                            memoizedTable = cloudTable;
+                        }
+                    }
+                }
 
-                return cloudTable;
+                return memoizedTable;
             };
         }
     }

@@ -11,7 +11,7 @@ namespace Microsoft.Extensions.DependencyInjection
     public static class CloudQueueProvider
     {
         /// <summary>
-        /// Returns a <see cref="CloudQueue"/> provider initialized from a connection string name and a queue name.
+        /// Returns a memoized <see cref="CloudQueue"/> provider initialized from a connection string name and a queue name.
         /// Will create the queue if it does not exists.
         /// </summary>
         /// <param name="connectionStringName">The name of the connection string.</param>
@@ -21,21 +21,33 @@ namespace Microsoft.Extensions.DependencyInjection
             string connectionStringName,
             string queueName)
         {
+            CloudQueue memoizedQueue = null;
+            var objectLock = new object();
             return (sp) =>
             {
-                var configuration = sp.GetRequiredService<IConfiguration>();
-                var connectionString = configuration.GetConnectionString(connectionStringName);
-                var storageAccount = CloudStorageAccount.Parse(connectionString);
-                var queueClient = storageAccount.CreateCloudQueueClient();
-                var cloudQueue = queueClient.GetQueueReference(queueName);
-                cloudQueue.CreateIfNotExists();
+                if (memoizedQueue is null)
+                {
+                    lock (objectLock)
+                    {
+                        if (memoizedQueue is null)
+                        {
+                            var configuration = sp.GetRequiredService<IConfiguration>();
+                            var connectionString = configuration.GetConnectionString(connectionStringName);
+                            var storageAccount = CloudStorageAccount.Parse(connectionString);
+                            var queueClient = storageAccount.CreateCloudQueueClient();
+                            var cloudQueue = queueClient.GetQueueReference(queueName);
+                            cloudQueue.CreateIfNotExists();
+                            memoizedQueue = cloudQueue;
+                        }
+                    }
+                }
 
-                return cloudQueue;
+                return memoizedQueue;
             };
         }
 
         /// <summary>
-        /// Returns a <see cref="CloudQueue"/> provider initialized from a connection string and a queue name.
+        /// Returns a memoized <see cref="CloudQueue"/> provider initialized from a connection string and a queue name.
         /// Will create the queue if it does not exists.
         /// </summary>
         /// <param name="connectionString">The connection string.</param>
@@ -45,14 +57,27 @@ namespace Microsoft.Extensions.DependencyInjection
             string connectionString,
             string queueName)
         {
+            CloudQueue memoizedQueue = null;
+            var objectLock = new object();
+
             return (sp) =>
             {
-                var storageAccount = CloudStorageAccount.Parse(connectionString);
-                var queueClient = storageAccount.CreateCloudQueueClient();
-                var cloudQueue = queueClient.GetQueueReference(queueName);
-                cloudQueue.CreateIfNotExists();
+                if (memoizedQueue is null)
+                {
+                    lock (objectLock)
+                    {
+                        if (memoizedQueue is null)
+                        {
+                            var storageAccount = CloudStorageAccount.Parse(connectionString);
+                            var queueClient = storageAccount.CreateCloudQueueClient();
+                            var cloudQueue = queueClient.GetQueueReference(queueName);
+                            cloudQueue.CreateIfNotExists();
+                            memoizedQueue = cloudQueue;
+                        }
+                    }
+                }
 
-                return cloudQueue;
+                return memoizedQueue;
             };
         }
     }
