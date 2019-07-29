@@ -43,7 +43,7 @@ namespace BackgroundProcessing.Core.Tests.Events
 
                 foreach (var command in commands)
                 {
-                    foreach (var status in new[] { BackgroundCommandEventStatus.Dispatching, BackgroundCommandEventStatus.Processing, BackgroundCommandEventStatus.Processed })
+                    foreach (var status in new[] { BackgroundCommandEventStatus.Dispatched, BackgroundCommandEventStatus.Processing, BackgroundCommandEventStatus.Processed })
                     {
                         repositoryMock.Verify(
                             x => x.Add(

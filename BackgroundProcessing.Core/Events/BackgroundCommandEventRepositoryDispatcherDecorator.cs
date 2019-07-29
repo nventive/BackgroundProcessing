@@ -28,11 +28,11 @@ namespace BackgroundProcessing.Core.Events
         /// <inheritdoc />
         public async Task DispatchAsync(IBackgroundCommand command, CancellationToken cancellationToken = default)
         {
-            // We intentionally send the dispatching event first, otherwise we are running into concurrency issue with the processing.
-            await _repository.Add(new BackgroundCommandEvent(command, BackgroundCommandEventStatus.Dispatching, DateTimeOffset.UtcNow));
             try
             {
+                var dispatchEvent = new BackgroundCommandEvent(command, BackgroundCommandEventStatus.Dispatched, DateTimeOffset.UtcNow);
                 await _wrappedDispatcher.DispatchAsync(command, cancellationToken);
+                await _repository.Add(dispatchEvent);
             }
             catch (Exception ex)
             {

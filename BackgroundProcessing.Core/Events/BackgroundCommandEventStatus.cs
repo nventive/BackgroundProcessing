@@ -11,9 +11,9 @@
         Unknown,
 
         /// <summary>
-        /// The command is being dispatched, but processing has not started.
+        /// The command has been dispatched, but processing has not started.
         /// </summary>
-        Dispatching,
+        Dispatched,
 
         /// <summary>
         /// Processing is in progress.
