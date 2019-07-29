@@ -1,6 +1,8 @@
 ﻿using System;
 using BackgroundProcessing.Caching;
+using BackgroundProcessing.Core;
 using BackgroundProcessing.Core.Events;
+using BackgroundProcessing.Core.Serializers;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -47,13 +49,13 @@ namespace Microsoft.Extensions.DependencyInjection
                 throw new ArgumentNullException(nameof(builder));
             }
 
-            builder.Services.TryAddSingleton<IBackgroundCommandEventsSerializer>(sp => new JsonNetBackgroundCommandEventSerializer());
+            builder.Services.TryAddSingleton<IBackgroundCommandSerializer, JsonNetBackgroundCommandSerializer>();
 
             builder.Services.AddSingleton<IBackgroundCommandEventRepository>(
                 sp => new DistributedCacheBackgroundCommandEventRepository(
                     sp.GetRequiredService<IDistributedCache>(),
                     expiration.HasValue ? expiration.Value : TimeSpan.FromMinutes(10),
-                    sp.GetService<IBackgroundCommandEventsSerializer>()));
+                    sp.GetService<IBackgroundCommandSerializer>()));
             return builder;
         }
     }
