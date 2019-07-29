@@ -281,11 +281,58 @@ storage and retrieval of events related to commands.
 
 ### Store events in the ASP.NET Core cache.
 
-Install-Package
+Install the corresponding package:
+
+```
+Install-Package BackgroundProcessing.Caching
+```
+
+Then configure the repository:
+
+```csharp
+// Then during the registration of the processor/services:
+using Microsoft.Extensions.DependencyInjection;
+
+// To use the IMemoryCache
+services
+    .AddMemoryCache()
+    .Add...Processing() // or Add...Dispatcher()
+    .AddBackgroundCommandEventsRepositoryDecorators()
+    .AddMemoryCacheEventRepository();
+
+// To use the IDistributedCache
+services
+    .AddDistributedMemoryCache() // Or any other IDistributedCache implementation
+    .Add...Processing() // or Add...Dispatcher()
+    .AddBackgroundCommandEventsRepositoryDecorators()
+    .AddDistributedCacheEventRepository();
+```
+
+The expiration of events in the cache is configurable (defaults to 10 minutes).
 
 ### Store events in an Azure Table Storage
 
-Install-Package
+Install the corresponding package:
+
+```
+Install-Package BackgroundProcessing.Azure.Storage.Table
+```
+
+Then configure the repository:
+
+```csharp
+// Then during the registration of the processor/services:
+using Microsoft.Extensions.DependencyInjection;
+
+// This takes care of instantiating the CloudTable instance and
+// creating the table if it does not exists.
+var cloudTableProvider = CloudTableProvider.FromConnectionStringName("ConnectionStringName", "TableName");
+
+services
+    .Add...Processing() // or Add...Dispatcher()
+    .AddBackgroundCommandEventsRepositoryDecorators()
+    .AddCloudTableEventRepository(cloudTableProvider);
+```
 
 ### Query events
 
@@ -294,8 +341,75 @@ To query events, just require and use the `IBackgroundCommandEventRepository` in
 Example of such usage in a ASP.NET Core Controller with a polling REST API:
 
 ```csharp
+using System.Threading.Tasks;
+using BackgroundProcessing.Core;
+using BackgroundProcessing.Core.Events;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 
+namespace BackgroundProcessing.WebSample
+{
+    // See http://restalk-patterns.org/long-running-operation-polling.html
+    [ApiController]
+    public class SampleController : ControllerBase
+    {
+        [HttpPost("api/v1/commands")]
+        [ProducesResponseType(StatusCodes.Status202Accepted)]
+        [ProducesDefaultResponseType]
+        public async Task<IActionResult> DispatchCommand(
+            [FromServices] IBackgroundDispatcher dispatcher)
+        {
+            var command = new SampleCommand();
+            await dispatcher.DispatchAsync(command);
+            return AcceptedAtRoute(nameof(GetCommandStatus), new { id = command.Id });
+        }
 
+        [HttpGet("api/v1/commands/{id}", Name = nameof(GetCommandStatus))]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status303SeeOther)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesDefaultResponseType]
+        public async Task<IActionResult> GetCommandStatus(
+            [FromRoute] string id,
+            [FromServices] IBackgroundCommandEventRepository repository)
+        {
+            var latestEvent = await repository.GetLatestEventForCommandId(id);
+            if (latestEvent is null)
+            {
+                return NotFound();
+            }
+
+            switch (latestEvent.Status)
+            {
+                case BackgroundCommandEventStatus.Dispatching:
+                case BackgroundCommandEventStatus.Processing:
+                    // Indicate the desired polling frequency, in seconds.
+                    Response.Headers.Add("Retry-After", "10");
+                    return NoContent();
+                case BackgroundCommandEventStatus.Processed:
+                    // Once executed, redirect to the output.
+                    return SeeOther(Url.RouteUrl(nameof(GetCommandOutput), new { id }));
+                default:
+                    return StatusCode(StatusCodes.Status500InternalServerError);
+            }
+        }
+
+        [HttpGet("api/v1/commands/{id}/output", Name = nameof(GetCommandOutput))]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesDefaultResponseType]
+        public async Task<IActionResult> GetCommandOutput([FromRoute] string id)
+        {
+            // This part is up to you / your business logic.
+            if (id is null)
+            {
+                return NotFound();
+            }
+
+            return Ok();
+        }
+    }
+}
 
 ```
 

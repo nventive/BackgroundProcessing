@@ -45,7 +45,7 @@ namespace BackgroundProcessing.WebSample
                     return NoContent();
                 case BackgroundCommandEventStatus.Processed:
                     // Once executed, redirect to the output.
-                    return this.SeeOther(Url.RouteUrl(nameof(GetCommandOutput), new { id }));
+                    return SeeOther(Url.RouteUrl(nameof(GetCommandOutput), new { id }));
                 default:
                     return StatusCode(StatusCodes.Status500InternalServerError);
             }
