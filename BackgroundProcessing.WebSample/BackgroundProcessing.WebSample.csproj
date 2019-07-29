@@ -1,0 +1,26 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.2</TargetFramework>
+    <AspNetCoreHostingModel>InProcess</AspNetCoreHostingModel>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AspNetCore.Mvc.HttpActionResults.Redirection.Extensions" Version="0.3.0" />
+    <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.7.1" />
+    <PackageReference Include="Microsoft.AspNetCore.App" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Api.Analyzers" Version="2.2.6" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="..\TestsSuppressions.cs" Link="Properties\TestsSuppressions.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\BackgroundProcessing.Azure.ApplicationInsights\BackgroundProcessing.Azure.ApplicationInsights.csproj" />
+    <ProjectReference Include="..\BackgroundProcessing.Caching\BackgroundProcessing.Caching.csproj" />
+    <ProjectReference Include="..\BackgroundProcessing.Core\BackgroundProcessing.Core.csproj" />
+  </ItemGroup>
+
+</Project>

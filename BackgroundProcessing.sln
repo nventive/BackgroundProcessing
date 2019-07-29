@@ -24,7 +24,17 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BackgroundProcessing.Azure.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BackgroundProcessing.Azure.Storage.Queue.Tests", "BackgroundProcessing.Azure.Storage.Queue.Tests\BackgroundProcessing.Azure.Storage.Queue.Tests.csproj", "{2883098E-DE57-4EFF-9BFA-78DB42A86CDF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BackgroundProcessing.Azure.ApplicationInsights", "BackgroundProcessing.Azure.ApplicationInsights\BackgroundProcessing.Azure.ApplicationInsights.csproj", "{15BB7B67-C6BE-4CAE-AA9A-1AE2FF0C485F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BackgroundProcessing.Azure.ApplicationInsights", "BackgroundProcessing.Azure.ApplicationInsights\BackgroundProcessing.Azure.ApplicationInsights.csproj", "{15BB7B67-C6BE-4CAE-AA9A-1AE2FF0C485F}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BackgroundProcessing.Caching", "BackgroundProcessing.Caching\BackgroundProcessing.Caching.csproj", "{699823DF-F72F-4463-9EB7-80A8D3E39AB6}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BackgroundProcessing.Caching.Tests", "BackgroundProcessing.Caching.Tests\BackgroundProcessing.Caching.Tests.csproj", "{16EC575E-D55D-4338-86BE-7557A20CECE7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BackgroundProcessing.Azure.Storage.Table", "BackgroundProcessing.Azure.Storage.Table\BackgroundProcessing.Azure.Storage.Table.csproj", "{2086E896-ECD6-4C58-A8A0-C165F124A7F5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BackgroundProcessing.Azure.Storage.Table.Tests", "BackgroundProcessing.Azure.Storage.Table.Tests\BackgroundProcessing.Azure.Storage.Table.Tests.csproj", "{B5292097-25FD-43DC-8897-3D1860928640}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BackgroundProcessing.WebSample", "BackgroundProcessing.WebSample\BackgroundProcessing.WebSample.csproj", "{BD2267F2-A286-4CA9-8CA8-7BA317F5D119}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -52,6 +62,26 @@ Global
 		{15BB7B67-C6BE-4CAE-AA9A-1AE2FF0C485F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{15BB7B67-C6BE-4CAE-AA9A-1AE2FF0C485F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{15BB7B67-C6BE-4CAE-AA9A-1AE2FF0C485F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{699823DF-F72F-4463-9EB7-80A8D3E39AB6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{699823DF-F72F-4463-9EB7-80A8D3E39AB6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{699823DF-F72F-4463-9EB7-80A8D3E39AB6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{699823DF-F72F-4463-9EB7-80A8D3E39AB6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{16EC575E-D55D-4338-86BE-7557A20CECE7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{16EC575E-D55D-4338-86BE-7557A20CECE7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{16EC575E-D55D-4338-86BE-7557A20CECE7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{16EC575E-D55D-4338-86BE-7557A20CECE7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2086E896-ECD6-4C58-A8A0-C165F124A7F5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2086E896-ECD6-4C58-A8A0-C165F124A7F5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2086E896-ECD6-4C58-A8A0-C165F124A7F5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2086E896-ECD6-4C58-A8A0-C165F124A7F5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B5292097-25FD-43DC-8897-3D1860928640}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B5292097-25FD-43DC-8897-3D1860928640}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B5292097-25FD-43DC-8897-3D1860928640}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B5292097-25FD-43DC-8897-3D1860928640}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BD2267F2-A286-4CA9-8CA8-7BA317F5D119}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BD2267F2-A286-4CA9-8CA8-7BA317F5D119}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BD2267F2-A286-4CA9-8CA8-7BA317F5D119}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BD2267F2-A286-4CA9-8CA8-7BA317F5D119}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

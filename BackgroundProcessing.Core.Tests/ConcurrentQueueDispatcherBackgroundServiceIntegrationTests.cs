@@ -25,8 +25,8 @@ namespace BackgroundProcessing.Core.Tests
         [Fact]
         public async Task ItShouldProcessBackgroundCommands()
         {
-            HostingServiceIntegrationTestsCommandHandler.Commands.Clear();
-            var commands = new[] { new HostingServiceIntegrationTestsCommand(), new HostingServiceIntegrationTestsCommand() };
+            ConcurrentQueueIntegrationTestsCommandHandler.Commands.Clear();
+            var commands = new[] { new ConcurrentQueueIntegrationTestsCommand(), new ConcurrentQueueIntegrationTestsCommand() };
 
             using (var host = new HostBuilder()
                 .ConfigureServices(services =>
@@ -51,25 +51,25 @@ namespace BackgroundProcessing.Core.Tests
                 var awaiter = host.Services.GetRequiredService<CountdownEventBackgroundProcessorAwaiter>();
                 awaiter.Wait(TimeSpan.FromSeconds(30));
 
-                HostingServiceIntegrationTestsCommandHandler.Commands.Should().HaveCount(commands.Count());
+                ConcurrentQueueIntegrationTestsCommandHandler.Commands.Should().HaveCount(commands.Count());
             }
         }
 
-        private class HostingServiceIntegrationTestsCommand : BackgroundCommand
+        private class ConcurrentQueueIntegrationTestsCommand : BackgroundCommand
         {
         }
 
-        private class HostingServiceIntegrationTestsCommandHandler : IBackgroundCommandHandler<HostingServiceIntegrationTestsCommand>
+        private class ConcurrentQueueIntegrationTestsCommandHandler : IBackgroundCommandHandler<ConcurrentQueueIntegrationTestsCommand>
         {
-            public static readonly ConcurrentBag<HostingServiceIntegrationTestsCommand> Commands = new ConcurrentBag<HostingServiceIntegrationTestsCommand>();
+            public static readonly ConcurrentBag<ConcurrentQueueIntegrationTestsCommand> Commands = new ConcurrentBag<ConcurrentQueueIntegrationTestsCommand>();
             private readonly ITestOutputHelper _output;
 
-            public HostingServiceIntegrationTestsCommandHandler(ITestOutputHelper output)
+            public ConcurrentQueueIntegrationTestsCommandHandler(ITestOutputHelper output)
             {
                 _output = output ?? throw new ArgumentNullException(nameof(output));
             }
 
-            public async Task HandleAsync(HostingServiceIntegrationTestsCommand command, CancellationToken cancellationToken = default)
+            public async Task HandleAsync(ConcurrentQueueIntegrationTestsCommand command, CancellationToken cancellationToken = default)
             {
                 _output.WriteLine($"Processing {command}");
                 Commands.Add(command);
