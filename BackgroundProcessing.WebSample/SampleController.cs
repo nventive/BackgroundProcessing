@@ -38,14 +38,14 @@ namespace BackgroundProcessing.WebSample
 
             switch (latestEvent.Status)
             {
-                case BackgroundCommandEventStatus.Dispatching:
+                case BackgroundCommandEventStatus.Dispatched:
                 case BackgroundCommandEventStatus.Processing:
                     // Indicate the desired polling frequency, in seconds.
                     Response.Headers.Add("Retry-After", "10");
                     return NoContent();
                 case BackgroundCommandEventStatus.Processed:
                     // Once executed, redirect to the output.
-                    return SeeOther(Url.RouteUrl(nameof(GetCommandOutput), new { id }));
+                    return this.SeeOther(Url.RouteUrl(nameof(GetCommandOutput), new { id }));
                 default:
                     return StatusCode(StatusCodes.Status500InternalServerError);
             }
