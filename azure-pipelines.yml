@@ -16,6 +16,9 @@ steps:
 
 - script: dotnet test --no-build --configuration $(buildConfiguration) --logger:trx
   displayName: Test
+  env:
+    "ConnectionStrings:StorageQueue": $(ConnectionStrings:StorageQueue)
+    "ConnectionStrings:StorageTable": $(ConnectionStrings:StorageTable)
 
 - task: PublishTestResults@2
   displayName: Publish Tests Results
