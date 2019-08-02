@@ -14,7 +14,7 @@ steps:
 - script: dotnet build --configuration $(buildConfiguration) -p:Version=$(GitVersion.NuGetVersionV2) -p:FileVersion=$(GitVersion.AssemblySemVer) -p:InformationalVersion=$(GitVersion.InformationalVersion)
   displayName: Build
 
-- script: dotnet test --no-build --configuration $(buildConfiguration) --logger:trx
+- script: dotnet test --no-build --configuration $(buildConfiguration) --logger:trx -p:ParallelizeTestCollections=false
   displayName: Test
   env:
     "ConnectionStrings:StorageQueue": $(ConnectionStrings:StorageQueue)
