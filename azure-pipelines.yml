@@ -22,6 +22,7 @@ steps:
 
 - script: dotnet test --no-build --configuration $(buildConfiguration) --logger:trx -p:ParallelizeTestCollections=false -p:ParallelizeAssemblies=false -v diag
   displayName: Test
+  continueOnError: true
   env:
     "ConnectionStrings:StorageQueue": $(ConnectionStrings:StorageQueue)
     "ConnectionStrings:StorageTable": $(ConnectionStrings:StorageTable)
@@ -33,6 +34,7 @@ steps:
     testResultsFiles: '**/*.trx'
     mergeTestResults: true
     testRunTitle: 'Unit tests'
+    failTaskOnFailedTests: true
 
 - script: dotnet pack --no-build --configuration $(buildConfiguration) -p:Version=$(GitVersion.NuGetVersionV2) --output $(build.artifactStagingDirectory)
   displayName: Pack
