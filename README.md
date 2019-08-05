@@ -437,6 +437,8 @@ contributing to this project.
 
 Be mindful of our [Code of Conduct](CODE_OF_CONDUCT.md).
 
+To run the unit tests locally, you must use the [Azure Storage Emulator](https://docs.microsoft.com/en-us/azure/storage/common/storage-use-emulator).
+
 ## Acknowledgments
 
 - [Dataflow](https://docs.microsoft.com/en-us/dotnet/standard/parallel-programming/dataflow-task-parallel-library) for hosting services execution management
