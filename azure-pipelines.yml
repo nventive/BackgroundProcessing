@@ -11,6 +11,11 @@ steps:
   inputs:
     updateAssemblyInfo: false
 
+- task: UseDotNet@2
+  inputs:
+    packageType: 'sdk'
+    version: '2.2.6'
+
 - script: dotnet build --configuration $(buildConfiguration) -p:Version=$(GitVersion.NuGetVersionV2) -p:FileVersion=$(GitVersion.AssemblySemVer) -p:InformationalVersion=$(GitVersion.InformationalVersion)
   displayName: Build
 
